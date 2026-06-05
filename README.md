@@ -36,6 +36,19 @@ pnpm --filter @matchgoal/landing dev
 pnpm --filter @matchgoal/app dev
 ```
 
+## Branding
+
+Guia de marca, logos e design tokens (tema claro) ficam em
+[apps/landing/app/branding](./apps/landing/app/branding):
+
+- **Página de guia:** `pnpm --filter @matchgoal/landing dev` → http://localhost:3000/branding
+- **Tokens CSS:** [tokens.css](./apps/landing/app/branding/tokens.css) — paleta (laranja primário + navy),
+  neutros, semânticos, raios e sombras.
+- **Assets das logos:** [apps/landing/public/branding](./apps/landing/public/branding).
+
+Posicionamento da marca: análise estatística de futebol com IA — leitura de dados,
+nunca promessa de resultado. Tom adulto, esportivo e confiável.
+
 ## Fluxo de trabalho
 
 - Nunca commitar direto na `main` — trabalhe em branches (`feature/...`, `fix/...`) e integre via Pull Request.

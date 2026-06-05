@@ -1,0 +1,54 @@
+/**
+ * MatchGoal — Design Tokens (tema CLARO)
+ * Fonte única de verdade da identidade visual.
+ * Energia do laranja + seriedade do navy. Tom adulto, esportivo, confiável.
+ */
+:root {
+  /* ---- Marca: Laranja (primária) ---- */
+  --color-primary: #FF6A00;
+  --color-primary-hover: #E85D00;
+  --color-primary-active: #CC5200;
+  --color-primary-tint: #FFE2CC;
+  --color-primary-tint-soft: #FFF3EA;
+
+  /* ---- Marca: Navy (tinta/escuro) ---- */
+  --color-ink: #1E2A3A;
+  --color-ink-soft: #2B3A4E;
+  --color-ink-softer: #3C4F66;
+
+  /* ---- Neutros (escala de cinza coerente) ---- */
+  --color-bg: #FFFFFF;
+  --color-bg-soft: #F7F8FA;
+  --color-bg-muted: #EEF1F4;
+  --color-border: #E4E7EC;
+  --color-border-strong: #CDD3DB;
+  --color-text: #1E2A3A;
+  --color-text-muted: #5B6B7E;
+  --color-text-subtle: #8794A3;
+  --color-text-inverse: #FFFFFF;
+
+  /* ---- Semânticos ---- */
+  --color-success: #16A34A;
+  --color-success-tint: #DCFCE7;
+  --color-danger: #DC2626;
+  --color-danger-tint: #FEE2E2;
+  --color-warning: #F59E0B;
+  --color-warning-tint: #FEF3C7;
+  --color-info: #2563EB;
+  --color-info-tint: #DBEAFE;
+
+  /* ---- Tipografia ---- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  /* ---- Raios ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* ---- Sombras ---- */
+  --shadow-sm: 0 1px 2px rgba(30, 42, 58, 0.06);
+  --shadow-md: 0 4px 16px rgba(30, 42, 58, 0.08);
+  --shadow-lg: 0 12px 32px rgba(30, 42, 58, 0.12);
+}
