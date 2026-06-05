@@ -1,5 +1,5 @@
 // @matchgoal/shared — ponto de entrada do pacote compartilhado.
-// Exporte aqui tipos (/types), utils (/utils) e componentes de UI (/ui)
-// conforme forem criados. Por enquanto, vazio de propósito.
+// Tipos compartilhados entre app e landing. UI (/ui) e utils (/utils)
+// são exportados conforme forem criados.
 
-export {};
+export * from "./types";
