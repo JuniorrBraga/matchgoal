@@ -1,0 +1,87 @@
+/**
+ * MatchGoal — Design Tokens
+ * Tema CLARO (light-first). Inspiração: Copa do Mundo 2026 + Betano.
+ * Laranja vibrante dominante (#FF6A00), charcoal escuro para barras/contraste,
+ * verde para odds/positivo. Todos os pares de texto/fundo miram AA.
+ */
+
+:root {
+  /* ---- Marca: Laranja (primária) ---- */
+  --color-primary: #FF6A00;
+  --color-primary-hover: #F15E00;
+  --color-primary-strong: #E25200;
+  --color-primary-tint: #FFE7D5;
+  --color-primary-tint-soft: #FFF4EC;
+  --color-on-primary: #FFFFFF;
+
+  /* ---- Charcoal / Ink (Betano dark) ---- */
+  --color-ink: #14181F;
+  --color-ink-soft: #2A3340;
+  --color-ink-deep: #0E1116;
+
+  /* ---- Superfícies (claras) ---- */
+  --color-bg: #FFFFFF;
+  --color-bg-soft: #F4F6F9;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #FBFCFD;
+  --color-bg-muted: #EDF0F4;
+
+  /* ---- Bordas ---- */
+  --color-border: #E5E8EE;
+  --color-border-strong: #D2D7E0;
+
+  /* ---- Texto (escala de cinza coerente) ---- */
+  --color-text: #14181F;
+  --color-text-muted: #5A6573;
+  --color-text-subtle: #8A93A1;
+  --color-text-inverse: #FFFFFF;
+
+  /* ---- Odds (verde Betano) ---- */
+  --color-odds: #0E8C46;
+  --color-odds-bg: #E7F6EC;
+
+  /* ---- Semânticos ---- */
+  --color-success: #15A05A;
+  --color-success-tint: #E3F6EC;
+  --color-danger: #E0322F;
+  --color-danger-tint: #FCE7E6;
+  --color-warning: #E68A00;
+  --color-warning-tint: #FFF1D6;
+  --color-info: #2D6CF0;
+  --color-info-tint: #E4ECFE;
+
+  /* ---- Acento gramado (Copa) ---- */
+  --color-pitch: #1FA85A;
+  --color-pitch-deep: #0B7A3D;
+
+  /* ---- Tipografia (preenchida por next/font no app) ---- */
+  --font-display: "Anton", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---- Raios ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-full: 999px;
+
+  /* ---- Espaçamento ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+
+  /* ---- Sombras (claras) ---- */
+  --shadow-sm: 0 1px 2px rgba(20, 24, 31, 0.06);
+  --shadow-md: 0 8px 24px rgba(20, 24, 31, 0.08);
+  --shadow-lg: 0 18px 48px rgba(20, 24, 31, 0.12);
+  --shadow-orange: 0 12px 30px rgba(255, 106, 0, 0.28);
+
+  --maxw: 1140px;
+}
