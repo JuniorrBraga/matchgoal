@@ -1,0 +1,10 @@
+{
+  "name": "@matchgoal/api",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Camada de backend do MatchGoal (apenas estrutura - sem implementação ainda)",
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}
