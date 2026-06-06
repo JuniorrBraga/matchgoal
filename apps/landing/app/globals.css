@@ -41,6 +41,9 @@
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+
+/* offset para o nav sticky não cobrir o topo das seções */
+[id]{scroll-margin-top:80px}
 body{
   margin:0;font-family:var(--font);background:var(--paper);color:var(--ink);
   font-size:17px;line-height:1.55;font-weight:400;
