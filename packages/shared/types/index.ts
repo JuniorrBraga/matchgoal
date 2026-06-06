@@ -17,6 +17,11 @@ export type {
 } from "./group";
 
 export type {
+  PlayerInsightKind,
+  PlayerInsight,
+} from "./player";
+
+export type {
   MarketKey,
   Confidence,
   ProbabilityOutcome,

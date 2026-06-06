@@ -2,21 +2,21 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { Countdown } from "@/components/matches/Countdown";
 import { MatchExplorer } from "@/components/matches/MatchExplorer";
-import { getMatches } from "@/mocks";
+import { getMatchesData } from "@/lib/data";
 
 export const metadata = {
   title: "Partidas — MatchGoal",
 };
 
-export default function MatchesPage() {
-  const matches = getMatches();
+export default async function MatchesPage() {
+  const matches = await getMatchesData();
   const opener = matches[0];
 
   return (
     <AppShell>
-      <section className="hero rise" style={{ marginBottom: "var(--space-6)" }}>
+      <section className="hero hero--home rise" style={{ marginBottom: "var(--space-6)" }}>
         <div className="hero__inner">
-          <div>
+          <div className="hero__copy">
             <span className="hero__eyebrow">⚽ Copa do Mundo FIFA 2026</span>
             <h1 className="hero__title">
               Leia o jogo<br />
@@ -26,6 +26,7 @@ export default function MatchesPage() {
               Probabilidades, cenários estatísticos e bilhetes montados por IA
               para cada partida. Análise de dados — nunca promessa de resultado.
             </p>
+            <Countdown targetISO={opener.kickoff} label="Pontapé inicial em" />
             <div className="hero__actions">
               <Link href={`/matches/${opener.slug}`} className="btn btn--dark">
                 Ver análise da abertura
@@ -36,7 +37,17 @@ export default function MatchesPage() {
             </div>
           </div>
 
-          <Countdown targetISO={opener.kickoff} label="Pontapé inicial em" />
+          <div className="hero__art">
+            <div className="hero__trophy-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/brand/trofeu.png"
+                alt="Troféu da Copa do Mundo"
+                className="hero__trophy"
+              />
+              <span className="hero__trophy-shine" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </section>
 

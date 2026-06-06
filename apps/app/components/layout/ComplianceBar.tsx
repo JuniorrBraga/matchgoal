@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { compliance } from "@/lib/compliance";
 import { AgeBadge } from "./AgeBadge";
 
@@ -9,28 +10,34 @@ import { AgeBadge } from "./AgeBadge";
 export function ComplianceBar() {
   return (
     <footer className="compliance">
-      <div className="container compliance__inner">
-        <span className="compliance__line">
-          <AgeBadge />
-          <span>{compliance.ageNote}</span>
-        </span>
+      <div className="container">
+        <div className="compliance__brand">
+          <Image
+            src="/brand/logo-white.png"
+            alt="MatchGoal"
+            width={74}
+            height={42}
+          />
+        </div>
 
-        <span className="compliance__line">
-          <span className="compliance__strong">
-            {compliance.responsibility}
+        <div className="compliance__inner">
+          <span className="compliance__line">
+            <AgeBadge />
+            <span>{compliance.ageNote}</span>
           </span>
-        </span>
 
-        <span className="compliance__line">
-          <Link
-            className="compliance__link"
-            href={compliance.selfExclusion.href}
-          >
-            {compliance.selfExclusion.label}
-          </Link>
-        </span>
+          <span className="compliance__line">
+            <span className="compliance__strong">{compliance.responsibility}</span>
+          </span>
 
-        <p className="compliance__disclaimer">{compliance.aiDisclaimer}</p>
+          <span className="compliance__line">
+            <Link className="compliance__link" href={compliance.selfExclusion.href}>
+              {compliance.selfExclusion.label}
+            </Link>
+          </span>
+
+          <p className="compliance__disclaimer">{compliance.aiDisclaimer}</p>
+        </div>
       </div>
     </footer>
   );

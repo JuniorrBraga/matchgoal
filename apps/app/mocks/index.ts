@@ -5,6 +5,7 @@ import type {
   BetSlip,
   GroupStanding,
   Match,
+  PlayerInsight,
   Prediction,
   StatScenario,
 } from "@matchgoal/shared";
@@ -12,6 +13,7 @@ import { matches } from "./matches";
 import { predictions, scenarios } from "./predictions";
 import { betSlips } from "./bet-slips";
 import { standings } from "./standings";
+import { getDeepMarkets, getPlayerInsights } from "./deep";
 
 export function getMatches(): Match[] {
   return [...matches].sort((a, b) => a.kickoff.localeCompare(b.kickoff));
@@ -54,11 +56,21 @@ export function getStandings(): GroupStanding[] {
   return standings;
 }
 
+export function getDeepAnalysis(matchId: string): Prediction[] {
+  return getDeepMarkets(matchId);
+}
+
+export function getInsights(matchId: string): PlayerInsight[] {
+  return getPlayerInsights(matchId);
+}
+
 /** Análise completa de uma partida, agregada para a tela de detalhe. */
 export interface MatchAnalysis {
   match: Match;
   predictions: Prediction[];
+  deepMarkets: Prediction[];
   scenarios: StatScenario[];
+  playerInsights: PlayerInsight[];
   betSlips: BetSlip[];
 }
 
@@ -68,7 +80,9 @@ export function getMatchAnalysis(slug: string): MatchAnalysis | undefined {
   return {
     match,
     predictions: getPredictions(match.id),
+    deepMarkets: getDeepMarkets(match.id),
     scenarios: getScenarios(match.id),
+    playerInsights: getPlayerInsights(match.id),
     betSlips: getBetSlips(match.id),
   };
 }
