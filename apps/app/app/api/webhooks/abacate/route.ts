@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { resend } from '@/lib/email'
 
 interface AbacateWebhookBody {
   event: string
