@@ -2,9 +2,19 @@
   "name": "@matchgoal/api",
   "private": true,
   "version": "0.0.0",
-  "description": "Camada de backend do MatchGoal (apenas estrutura - sem implementação ainda)",
-  "scripts": {},
+  "description": "Camada de backend do MatchGoal — integração API-Football + análise profunda",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "test": "tsx test/analysis.test.ts",
+    "live": "tsx test/live.ts"
+  },
+  "dependencies": {
+    "@matchgoal/shared": "workspace:*"
+  },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.8.0"
   }
 }

@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@matchgoal/api": "workspace:*",
     "@matchgoal/shared": "workspace:*",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.47.0",

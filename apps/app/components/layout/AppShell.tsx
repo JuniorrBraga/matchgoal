@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { ComplianceBar } from "./ComplianceBar";
 
@@ -16,11 +17,15 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <header className="topbar">
         <div className="container topbar__row">
-          <Link href="/matches" className="brand">
-            <span className="brand__mark">⚽</span>
-            <span className="brand__name">
-              Match<span style={{ color: "var(--color-ink)" }}>Goal</span>
-            </span>
+          <Link href="/matches" className="brand" aria-label="MatchGoal">
+            <Image
+              className="brand__logo"
+              src="/brand/logo-white.png"
+              alt="MatchGoal"
+              width={84}
+              height={48}
+              priority
+            />
           </Link>
           <nav className="topbar__nav">
             <Link href="/matches">Partidas</Link>
