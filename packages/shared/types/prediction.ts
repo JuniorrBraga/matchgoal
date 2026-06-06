@@ -5,7 +5,9 @@ export type MarketKey =
   | "over_under"
   | "btts"
   | "double_chance"
-  | "correct_score";
+  | "correct_score"
+  | "cards"
+  | "corners";
 
 export type Confidence = "low" | "medium" | "high";
 
