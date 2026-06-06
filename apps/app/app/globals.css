@@ -90,7 +90,7 @@ img {
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  height: 60px;
+  height: 66px;
 }
 .brand {
   display: flex;
@@ -698,6 +698,33 @@ img {
 .cta-note { font-size: 11.5px; color: var(--color-text-subtle); text-align: center; margin-top: var(--space-3); }
 .cta-note a { color: var(--color-primary-strong); font-weight: 700; }
 
+/* destaques de jogador */
+.pins { padding: var(--space-3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.pin {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+}
+.pin__icon { font-size: 20px; line-height: 1.2; }
+.pin__body { flex: 1; min-width: 0; }
+.pin__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.pin__player { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 7px; min-width: 0; }
+.pin__team {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.04em;
+  background: var(--color-ink); color: #fff;
+  border-radius: var(--radius-full); padding: 2px 7px;
+}
+.pin__val { font-family: var(--font-display); font-size: 19px; color: var(--color-primary-strong); }
+.pin__label { font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+.pin__detail { font-size: 11px; color: var(--color-text-subtle); margin-top: 6px; line-height: 1.4; }
+.pin--card .pin__val { color: var(--color-warning); }
+.pin--card .prob-bar__fill--lead { background: linear-gradient(90deg, #FFC24A, var(--color-warning)); }
+@media (max-width: 560px) { .pins { grid-template-columns: 1fr; } }
+
 /* painel lateral (sticky) */
 .side-panel { position: sticky; top: 84px; display: flex; flex-direction: column; gap: var(--space-4); }
 .insight {
@@ -787,6 +814,107 @@ img {
   .mrow { grid-template-columns: 74px 1fr; }
   .mrow__odds { grid-column: 1 / -1; margin-top: var(--space-2); }
 }
+/* ---------- marca (logo real) ---------- */
+.brand { display: inline-flex; align-items: center; }
+.brand__logo {
+  display: block;
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+  transition: transform 0.15s ease;
+}
+.brand:hover .brand__logo { transform: scale(1.04); }
+
+.compliance__brand {
+  display: flex;
+  align-items: center;
+  padding-top: var(--space-6);
+}
+.compliance__brand img { height: 42px; width: auto; }
+
+/* ---------- hero: troféu ---------- */
+.hero--home .hero__inner {
+  grid-template-columns: 1.25fr 1fr;
+}
+.hero__copy .countdown {
+  max-width: 440px;
+  margin-top: var(--space-5);
+}
+.hero__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hero__art::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 214, 0.62) 0%,
+    rgba(255, 158, 60, 0.2) 48%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  animation: glowpulse 3.8s ease-in-out infinite;
+}
+.hero__trophy-wrap {
+  position: relative;
+  width: 370px;
+  max-width: 100%;
+  margin: -8px 0;
+  animation: float 5.5s ease-in-out infinite;
+}
+.hero__trophy {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 26px 40px rgba(80, 30, 0, 0.45));
+}
+/* brilho deslizante recortado na silhueta do troféu */
+.hero__trophy-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask: url(/brand/trofeu.png) center / contain no-repeat;
+  mask: url(/brand/trofeu.png) center / contain no-repeat;
+  background: linear-gradient(
+    105deg,
+    transparent 43%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 57%
+  );
+  background-size: 250% 100%;
+  mix-blend-mode: screen;
+  animation: sheen 3.6s linear infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+@keyframes glowpulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+@keyframes sheen {
+  from { background-position: 185% 0; }
+  to { background-position: -85% 0; }
+}
+
+@media (max-width: 900px) {
+  .hero--home .hero__inner { grid-template-columns: 1fr; }
+  .hero__art { margin-top: var(--space-4); }
+  .hero__trophy-wrap { width: 270px; }
+  .hero__art::before { width: 300px; height: 300px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .rise, .prob-bar__fill, .ticker__track { animation: none; opacity: 1; transform: none; }
+  .rise, .prob-bar__fill, .ticker__track,
+  .hero__trophy-wrap, .hero__trophy-shine, .hero__art::before {
+    animation: none; opacity: 1; transform: none;
+  }
+  .hero__trophy-shine { display: none; }
 }
