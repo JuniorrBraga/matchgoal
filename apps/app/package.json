@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@matchgoal/api": "workspace:*",
     "@matchgoal/shared": "workspace:*",
     "next": "^15.3.0",
     "react": "^19.0.0",

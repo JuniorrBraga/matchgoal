@@ -5,6 +5,7 @@ import { AiAnalysisHeader } from "@/components/match-detail/AiAnalysisHeader";
 import { FormGuide } from "@/components/match-detail/FormGuide";
 import { ProbabilityCard } from "@/components/match-detail/ProbabilityCard";
 import { ScenarioCard } from "@/components/match-detail/ScenarioCard";
+import { PlayerInsights } from "@/components/match-detail/PlayerInsights";
 import { InsightPanel } from "@/components/match-detail/InsightPanel";
 import { BetSlipCard } from "@/components/bet-slip/BetSlipCard";
 import { getMatchAnalysis, getMatches } from "@/mocks";
@@ -22,7 +23,8 @@ export default async function MatchDetailPage({
   const analysis = getMatchAnalysis(slug);
   if (!analysis) notFound();
 
-  const { match, predictions, scenarios, betSlips } = analysis;
+  const { match, predictions, deepMarkets, scenarios, playerInsights, betSlips } =
+    analysis;
   const headline =
     predictions.find((p) => p.market === "1x2")?.summary ??
     "Análise em preparação.";
@@ -50,6 +52,30 @@ export default async function MatchDetailPage({
                 ))}
               </div>
             </section>
+
+            {deepMarkets.length > 0 && (
+              <section>
+                <div className="section-head">
+                  <h2 className="section-title">Mercados avançados</h2>
+                  <span className="eyebrow">Cartões · Escanteios</span>
+                </div>
+                <div className="cards-2">
+                  {deepMarkets.map((p) => (
+                    <ProbabilityCard key={p.id} prediction={p} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {playerInsights.length > 0 && (
+              <section>
+                <div className="section-head">
+                  <h2 className="section-title">Destaques de jogadores</h2>
+                  <span className="eyebrow">por IA</span>
+                </div>
+                <PlayerInsights insights={playerInsights} />
+              </section>
+            )}
 
             {scenarios.length > 0 && (
               <section>

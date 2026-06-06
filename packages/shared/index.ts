@@ -3,3 +3,4 @@
 // são exportados conforme forem criados.
 
 export * from "./types";
+export * from "./analysis";

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { BetSlip, Match } from "@matchgoal/shared";
 import { odds } from "@/lib/format";
 import { AgeBadge } from "@/components/layout/AgeBadge";
@@ -42,9 +43,13 @@ export function ShareableImage({
         </div>
 
         <div className="share-canvas__brand">
-          <span className="brand__name">
-            Match<span style={{ color: "var(--color-primary)" }}>Goal</span>
-          </span>
+          <Image
+            src="/brand/wordmark.png"
+            alt="MatchGoal"
+            width={150}
+            height={28}
+            style={{ height: 26, width: "auto" }}
+          />
           <AgeBadge />
         </div>
       </div>
