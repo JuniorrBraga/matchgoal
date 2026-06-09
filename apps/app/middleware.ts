@@ -63,6 +63,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Protege tudo exceto: assets estáticos, paywall, auth, webhooks e cron
-    '/((?!_next/static|_next/image|favicon\\.ico|paywall|auth|jogo-responsavel|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|paywall|login|auth|jogo-responsavel|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
