@@ -22,7 +22,7 @@ export default function Home() {
       <Transparency />
       <Plans />
 
-      <section className="section-pad" id="faq" style={{ background: "var(--paper-2)" }}>
+      <section className="section-pad" id="faq">
         <div className="wrap">
           <Reveal className="sec-head" style={{ textAlign: "center", marginInline: "auto" }}>
             <span className="eyebrow">Perguntas frequentes</span>
