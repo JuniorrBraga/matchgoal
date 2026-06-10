@@ -23,7 +23,7 @@ export default async function SharePage({
   if (!slip) notFound();
 
   return (
-    <AppShell>
+    <AppShell active="matches">
       <Link href={`/matches/${slug}`} className="back-link">
         ← Voltar para a análise
       </Link>

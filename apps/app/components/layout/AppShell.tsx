@@ -11,8 +11,16 @@ const tickerItems = [
   "Análise de dados — não promessa de resultado",
 ];
 
+type ActiveSection = "matches" | "grupos" | "paywall";
+
 /** Shell raiz do app: top bar laranja + ticker + conteúdo + conformidade. */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  active,
+}: {
+  children: ReactNode;
+  active?: ActiveSection;
+}) {
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -28,9 +36,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
           <nav className="topbar__nav">
-            <Link href="/matches">Partidas</Link>
-            <Link href="/grupos">Grupos</Link>
-            <Link href="/paywall">Planos</Link>
+            <Link href="/matches" className={active === "matches" ? "active" : undefined}>
+              Partidas
+            </Link>
+            <Link href="/grupos" className={active === "grupos" ? "active" : undefined}>
+              Grupos
+            </Link>
+            <Link href="/paywall" className={active === "paywall" ? "active" : undefined}>
+              Planos
+            </Link>
           </nav>
           <span className="topbar__spacer" />
           <Link href="/login" style={{ color: 'var(--color-text-inverse)', fontSize: 14, fontWeight: 600, marginRight: 12 }}>

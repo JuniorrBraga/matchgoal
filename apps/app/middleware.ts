@@ -37,8 +37,19 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const redirectToPaywall = () => {
+    const url = new URL('/paywall', request.url)
+    const { pathname } = request.nextUrl
+    if (pathname.startsWith('/grupos')) {
+      url.searchParams.set('locked', 'grupos')
+    } else if (pathname.startsWith('/matches')) {
+      url.searchParams.set('locked', 'matches')
+    }
+    return NextResponse.redirect(url)
+  }
+
   if (!user) {
-    return NextResponse.redirect(new URL('/paywall', request.url))
+    return redirectToPaywall()
   }
 
   // Verifica assinatura ativa
@@ -54,7 +65,7 @@ export async function middleware(request: NextRequest) {
     new Date(profile.period_end) > new Date()
 
   if (!isActive) {
-    return NextResponse.redirect(new URL('/paywall', request.url))
+    return redirectToPaywall()
   }
 
   return supabaseResponse

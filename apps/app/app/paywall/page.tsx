@@ -14,9 +14,30 @@ const features = [
   { icon: "🖼️", label: "Imagens compartilháveis" },
 ];
 
-export default function PaywallPage() {
+const lockedMessages: Record<string, string> = {
+  matches: "Assine o Pro Copa para liberar a análise das partidas.",
+  grupos: "Assine o Pro Copa para liberar a tabela e leituras dos grupos.",
+};
+
+export default async function PaywallPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ locked?: string }>;
+}) {
+  const { locked } = await searchParams;
+  const lockedMessage = locked ? lockedMessages[locked] : undefined;
+
   return (
-    <AppShell>
+    <AppShell active="paywall">
+      {lockedMessage && (
+        <div className="lock-banner">
+          <span className="lock-banner__icon">🔒</span>
+          <span className="lock-banner__text">
+            <strong>Acesso bloqueado.</strong> {lockedMessage}
+          </span>
+        </div>
+      )}
+
       {/* Hero laranja */}
       <section className="hero rise" style={{ marginBottom: "var(--space-8)" }}>
         <div className="hero__inner" style={{ gridTemplateColumns: "1fr" }}>
