@@ -33,6 +33,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link href="/paywall">Planos</Link>
           </nav>
           <span className="topbar__spacer" />
+          <Link href="/login" style={{ color: 'var(--color-text-inverse)', fontSize: 14, fontWeight: 600, marginRight: 12 }}>
+            Entrar
+          </Link>
           <Link href="/paywall" className="topbar__cta">
             Assinar Pro
           </Link>
