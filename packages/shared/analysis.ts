@@ -19,6 +19,8 @@ export interface PlayerSignal {
 export interface TeamDeepSignals {
   shortName: string;
   /** Força ofensiva 0..1 (relativa ao confronto). */
+
+   /** Força ofensiva 0..1 (relativa ao confronto). */
   attack: number;
   /** Força defensiva 0..1 (relativa ao confronto). */
   defense: number;
