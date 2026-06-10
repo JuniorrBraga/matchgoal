@@ -14,6 +14,17 @@ export async function middleware(request: NextRequest) {
   // Sem config de Supabase: não derruba o site (evita 500 no Edge). Apenas segue.
   if (!url || !anon) return NextResponse.next({ request })
 
+  const redirectToPaywall = () => {
+    const paywallUrl = new URL('/paywall', request.url)
+    const { pathname } = request.nextUrl
+    if (pathname.startsWith('/grupos')) {
+      paywallUrl.searchParams.set('locked', 'grupos')
+    } else if (pathname.startsWith('/matches')) {
+      paywallUrl.searchParams.set('locked', 'matches')
+    }
+    return NextResponse.redirect(paywallUrl)
+  }
+
   try {
     let supabaseResponse = NextResponse.next({ request })
 
@@ -39,7 +50,7 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     if (!user) {
-      return NextResponse.redirect(new URL('/paywall', request.url))
+      return redirectToPaywall()
     }
 
     // Verifica assinatura ativa
@@ -55,20 +66,20 @@ export async function middleware(request: NextRequest) {
       new Date(profile.period_end) > new Date()
 
     if (!isActive) {
-      return NextResponse.redirect(new URL('/paywall', request.url))
+      return redirectToPaywall()
     }
 
     return supabaseResponse
   } catch (err) {
     // Nunca derruba a página com 500 por erro de auth — fail-closed no paywall.
     console.error('[middleware] erro de auth:', err)
-    return NextResponse.redirect(new URL('/paywall', request.url))
+    return redirectToPaywall()
   }
 }
 
 export const config = {
   matcher: [
-    // Protege tudo exceto: assets estáticos, paywall, auth, webhooks e cron
-    '/((?!_next/static|_next/image|favicon\\.ico|paywall|auth|jogo-responsavel|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Protege tudo exceto: assets estáticos, paywall, login, auth, webhooks e cron
+    '/((?!_next/static|_next/image|favicon\\.ico|paywall|login|auth|jogo-responsavel|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

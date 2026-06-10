@@ -18,9 +18,9 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MatchGoal — Análise de futebol com IA",
+  title: "MatchGoal · Análise de futebol com IA",
   description:
-    "Análise estatística de futebol por IA, sem achismo. Probabilidades, cenários e histórico público — você confere cada acerto e cada erro.",
+    "Análise estatística de futebol por IA, sem achismo. Probabilidades, cenários e histórico público, você confere cada acerto e cada erro.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
