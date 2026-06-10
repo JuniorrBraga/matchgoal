@@ -42,7 +42,7 @@ const items: QA[] = [
     q: "Como pago e posso cancelar?",
     a: (
       <>
-        R$ 2,99 por análise avulsa ou R$ 29,90/mês ilimitado. Assinatura <b>sem fidelidade</b> —
+        R$ 2,99 por análise avulsa ou R$ 29,90/mês ilimitado. Assinatura <b>sem fidelidade</b>,
         cancele quando quiser.
       </>
     ),

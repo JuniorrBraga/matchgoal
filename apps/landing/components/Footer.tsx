@@ -16,7 +16,7 @@ export function Footer() {
             </h2>
             <p className="urg">
               A Copa começa em <b>11 de junho</b> e o Brasil estreia em <b>13 de junho</b>. São
-              104 jogos em poucas semanas — cada um sem leitura é uma análise que não volta.
+              104 jogos em poucas semanas, e cada um sem leitura é uma análise que não volta.
             </p>
           </Reveal>
           <Reveal
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
 
         <Reveal as="p" className="ps">
-          <b>PS:</b> Não vendemos sorte nem prometemos retorno — vendemos leitura honesta, com
+          <b>PS:</b> Não vendemos sorte nem prometemos retorno: vendemos leitura honesta, com
           histórico aberto pra conferir cada acerto e cada erro. Você vai acompanhar a Copa no
           dado ou no achismo?
         </Reveal>

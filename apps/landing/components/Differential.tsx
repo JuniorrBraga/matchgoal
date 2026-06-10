@@ -1,4 +1,4 @@
-import { CheckIcon, WarningIcon } from "./icons";
+import { CheckIcon } from "./icons";
 import { Reveal } from "./Reveal";
 
 const benefits = [
@@ -9,7 +9,7 @@ const benefits = [
     <b>10 segundos</b>, não meia hora garimpando print.
   </>,
   <>
-    Para de ser o trouxa do bolão — você leva <b>o dado</b> pra mesa.
+    Para de ser o trouxa do bolão: você leva <b>o dado</b> pra mesa.
   </>,
   <>
     Manda a análise no grupo <b>já formatada</b>, com cara de quem entende.
@@ -21,7 +21,7 @@ const benefits = [
 
 export function Differential() {
   return (
-    <section className="section-pad" id="diferencial" style={{ background: "var(--paper-2)" }}>
+    <section className="section-pad" id="diferencial">
       <div className="wrap">
         <div className="dif-grid">
           <Reveal>
@@ -85,20 +85,8 @@ export function Differential() {
                 Probabilidades, não certezas · +18 · aposte com responsabilidade
               </div>
             </div>
-            <p className="placeholder-note">
-              [ SLOT: card de análise + imagem compartilhável — exemplo real do app ]
-            </p>
           </Reveal>
         </div>
-        <Reveal
-          className="respband"
-          style={{ marginTop: "clamp(34px,4vw,52px)", maxWidth: 720 }}
-        >
-          <span className="ico">
-            <WarningIcon />
-          </span>
-          Aposte com responsabilidade. Jogue com moderação.
-        </Reveal>
       </div>
     </section>
   );
