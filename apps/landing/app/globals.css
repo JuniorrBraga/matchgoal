@@ -41,6 +41,9 @@
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+
+/* offset para o nav sticky não cobrir o topo das seções */
+[id]{scroll-margin-top:80px}
 body{
   margin:0;font-family:var(--font);background:var(--paper);color:var(--ink);
   font-size:17px;line-height:1.55;font-weight:400;
@@ -74,6 +77,8 @@ p{margin:0 0 1em}
 section{position:relative}
 .section-pad{padding-block:clamp(72px,10vw,128px)}
 .dark{background:var(--ink);color:var(--paper)}
+/* cor base das seções claras (mantida no mobile; sobrescrita pela taça no desktop) */
+#diferencial,#faq{background:var(--paper-2)}
 
 /* ---------- buttons ---------- */
 .btn{
@@ -195,9 +200,29 @@ section{position:relative}
    ========================================================= */
 .mock-stack{position:relative}
 .app-card{
-  background:#fff;border-radius:22px;border:1px solid var(--line);
+  background:
+    linear-gradient(rgba(21,19,26,.74),rgba(21,19,26,.84)),
+    url('/assets/imig_cardbrasil_brasil.jpg') center / cover no-repeat,
+    var(--ink);
+  border-radius:22px;border:1px solid var(--line-dark);
   box-shadow:var(--shadow);overflow:hidden;position:relative;z-index:2;
+  color:var(--paper);
 }
+/* card escuro: textos e superfícies internas em tom claro/translúcido */
+.app-card .app-head,.app-card .app-foot{background:transparent;border-color:var(--line-dark)}
+.app-card .app-head .tag{color:var(--orange-2)}
+.app-card .app-head .live{color:var(--muted-d)}
+.app-card .team .nm{color:var(--paper)}
+.app-card .vs{color:var(--muted-d)}
+.app-card .match-meta{color:var(--muted-d)}
+.app-card .prob-block h4{color:var(--muted-d)}
+.app-card .prob .top{color:var(--paper)}
+.app-card .prob .top .pct{color:#fff}
+.app-card .bar{background:rgba(255,255,255,.16)}
+.app-card .bar i.c{background:var(--muted-d)}
+.app-card .chip{background:rgba(255,255,255,.10);border-color:var(--line-dark);color:var(--paper)}
+.app-card .chip b{color:var(--orange-2)}
+.app-card .app-foot .share{color:var(--muted-d)}
 .app-head{display:flex;align-items:center;gap:10px;padding:14px 18px;
   border-bottom:1px solid var(--line);background:var(--paper)}
 .app-head .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
@@ -284,7 +309,14 @@ section{position:relative}
 
 /* shareable square mock */
 .share-mock{aspect-ratio:1/1;border-radius:var(--r-lg);overflow:hidden;position:relative;
-  background:var(--ink);color:#fff;box-shadow:var(--shadow);padding:26px;display:flex;
+  background:
+    linear-gradient(180deg,
+      rgba(21,19,26,.35) 0%,
+      rgba(21,19,26,.75) 55%,
+      rgba(21,19,26,.92) 100%),
+    url('/assets/img_card_brasil.jpg') center 22% / cover no-repeat,
+    var(--ink);
+  color:#fff;box-shadow:var(--shadow);padding:26px;display:flex;
   flex-direction:column;}
 .share-mock .sm-top{display:flex;align-items:center;justify-content:space-between}
 .share-mock .sm-top img{height:24px}
@@ -332,12 +364,11 @@ section{position:relative}
 .tess{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:clamp(40px,5vw,60px)}
 .tcard{background:var(--ink-2);border:1px solid var(--line-dark);border-radius:var(--r);
   padding:24px;display:flex;flex-direction:column;gap:16px}
-.tcard .ph-quote{height:62px;border-radius:10px;border:1px dashed var(--line-dark);
-  display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--muted-d);
-  text-align:center;padding:0 12px;letter-spacing:.02em;line-height:1.4}
+.tcard .quote{margin:0;flex:1;font-size:15px;line-height:1.5;color:var(--paper)}
 .tcard .who{display:flex;align-items:center;gap:12px}
-.tcard .avatar{width:42px;height:42px;border-radius:50%;border:1px dashed var(--line-dark);
-  display:grid;place-items:center;font-family:var(--mono);font-size:9px;color:var(--muted-d);flex:none;text-align:center}
+.tcard .avatar{width:42px;height:42px;border-radius:50%;flex:none;
+  display:grid;place-items:center;font-weight:800;font-stretch:108%;font-size:14px;
+  color:#fff;background:linear-gradient(135deg,var(--orange),var(--orange-deep));letter-spacing:0}
 .tcard .who .meta .nm{font-weight:800;font-size:14px}
 .tcard .who .meta .role{font-family:var(--mono);font-size:11px;color:var(--muted-d)}
 .authority{margin-top:clamp(34px,4vw,48px);font-family:var(--mono);font-size:13px;
@@ -347,7 +378,7 @@ section{position:relative}
 /* =========================================================
    PLANOS
    ========================================================= */
-.plans{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;align-items:stretch}
+.plans{display:grid;grid-template-columns:min(440px,100%);justify-content:center;gap:22px;align-items:stretch}
 .plan{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:34px 32px;
   display:flex;flex-direction:column;position:relative;overflow:hidden}
 .plan.feat{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:var(--shadow)}
@@ -455,4 +486,79 @@ section{position:relative}
   .hero-cta .btn{width:100%}
   .float-card{position:static;width:100%;margin-top:14px}
   .foot-legal{margin-left:0;width:100%}
+}
+
+/* =========================================================
+   FULL-VIEWPORT SECTIONS — desktop only
+   Cada seção cabe em 100% da tela, sem scroll para ler o conteúdo.
+   O Hero pode ter um respiro por causa do nav+countdown.
+   ========================================================= */
+@media (min-width:981px){
+  /* ---------- HERO ---------- */
+  /* preenche o viewport abaixo do nav (72px) + countdown (~48px) */
+  .hero{
+    min-height:calc(100dvh - 120px);
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .hero .wrap{padding-block:clamp(20px,2.6vh,44px);width:100%;align-items:center}
+  .hero h1{font-size:clamp(38px,4.6vw,64px)}
+  /* descrição compactada (mantida) */
+  .hero .sub{margin-top:14px;font-size:clamp(16px,1.6vw,18px);line-height:1.45}
+  .hero .valprop{margin-top:13px;font-size:14.5px}
+  .hero-cta{margin-top:20px}
+  .hero-foot{margin-top:15px}
+
+  /* app-card mais baixo → o float-card "Brasil 2×1" para de ser cortado */
+  .hero .app-head,.hero .app-foot{padding:10px 16px}
+  .hero .match-row{padding:14px 16px 8px}
+  .hero .crest{width:40px;height:40px;font-size:18px}
+  .hero .match-meta{padding-bottom:6px}
+  .hero .prob-block{padding:6px 16px 14px}
+  .hero .prob-block h4{margin-bottom:9px}
+  .hero .prob{margin-bottom:9px}
+  .hero .scn{padding:0 16px 12px}
+
+  /* ---------- DEMAIS SEÇÕES: tela inteira, conteúdo centrado ---------- */
+  #como,#diferencial,#transparencia,#planos,#faq{
+    min-height:100dvh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding-block:clamp(28px,3.5vh,52px);
+  }
+
+  /* títulos e cabeçalhos compactados */
+  #como h2.sec-title,
+  #diferencial h2.sec-title,
+  #transparencia h2.sec-title,
+  #planos h2.sec-title,
+  #faq h2.sec-title{font-size:clamp(30px,3.8vw,50px)}
+
+  #como .sec-head,
+  #transparencia .sec-head,
+  #planos .sec-head{margin-bottom:clamp(18px,2.6vh,34px)}
+
+  #diferencial .lead,#transparencia .sec-head p{margin-top:14px;font-size:clamp(16px,1.7vw,19px)}
+
+  /* Como funciona */
+  #como .steps{gap:16px}
+  #como .step{padding:clamp(20px,2.4vh,28px) 24px}
+
+  /* Diferencial */
+  #diferencial .share-mock{max-height:min(56vh,520px);padding:clamp(20px,2.4vh,26px)}
+  #diferencial .dif-list{gap:12px;margin-top:20px}
+
+  /* Transparência */
+  #transparencia .bars{height:clamp(120px,15vh,170px)}
+  #transparencia .tess{margin-top:clamp(18px,2.4vh,32px);gap:14px}
+  #transparencia .tcard{padding:clamp(14px,1.8vh,20px);gap:12px}
+  #transparencia .tcard .quote{font-size:14px}
+  #transparencia .tcard .avatar{width:38px;height:38px;font-size:13px}
+
+  /* Planos */
+  #planos .plan{padding:clamp(22px,2.6vh,32px) clamp(26px,2.4vw,32px)}
+  #planos .plan ul{gap:10px;margin-bottom:20px}
+  #planos .price .amt{font-size:clamp(38px,4vw,44px)}
+  #planos .risk{margin-top:clamp(18px,2.4vh,32px);padding:clamp(18px,2vh,30px)}
+
+  /* FAQ */
+  #faq .qa button{padding-block:clamp(14px,2vh,22px)}
 }

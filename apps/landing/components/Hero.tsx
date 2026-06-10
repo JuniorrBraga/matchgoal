@@ -8,20 +8,16 @@ export function Hero() {
       <DottedSurface color={[0.988, 0.365, 0.02]} opacity={0.28} size={6} fog="#FBF8F3" />
       <div className="wrap">
         <div className="hero-copy">
-          <span className="eyebrow">Análise de futebol · Inteligência artificial</span>
-          <h1 className="display" id="hero-headline" style={{ marginTop: 16 }}>
-            Análise de futebol com IA.{" "}
-            <span className="accent">Sem achismo, sem picaretagem.</span>
+          <h1 className="display" id="hero-headline">
+            Sem achismo, <span className="accent">sem picaretagem.</span>
           </h1>
+          <span className="eyebrow" style={{ display: "block", marginTop: 16 }}>
+            Análise de futebol com I.A.
+          </span>
           <p className="lead sub" id="hero-sub">
             O MatchGoal usa IA conectada a dados esportivos pra ler cada partida da Copa:
-            probabilidades, cenários e recortes históricos. Você decide com inteligência — não
+            probabilidades, cenários e recortes históricos. Você decide com inteligência, não
             com palpite de grupo de WhatsApp.
-          </p>
-          <p className="valprop">
-            A maioria das &quot;dicas&quot; de futebol é chute disfarçado de ciência. Aqui é o
-            contrário: leitura estatística por IA, em segundos. Não prometemos resultado —
-            prometemos clareza. E mostramos nosso histórico, erros inclusos.
           </p>
           <div className="hero-cta">
             <a className="btn big" href="/apps/app">
@@ -62,7 +58,7 @@ export function Hero() {
               <div className="team">
                 <div
                   className="crest"
-                  style={{ background: "linear-gradient(135deg,#2B2934,#000)" }}
+                  style={{ background: "linear-gradient(135deg,#E1322B,#9E1B12)" }}
                 >
                   CRO
                 </div>
@@ -110,12 +106,6 @@ export function Hero() {
                 Gerar imagem
               </a>
               <span className="share">card pronto em 8s</span>
-            </div>
-          </div>
-          <div className="float-card">
-            <div className="k">Cenário mais provável</div>
-            <div className="v">
-              Brasil <span>2 × 1</span>
             </div>
           </div>
         </Reveal>

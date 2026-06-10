@@ -10,12 +10,6 @@ function Tick() {
   );
 }
 
-const avulsaFeatures: ReactNode[] = [
-  "Análise estatística completa de 1 partida",
-  "Card com probabilidades + cenários",
-  "Imagem pronta pra compartilhar",
-];
-
 const ilimitadoFeatures: ReactNode[] = [
   <>
     Análises <b>ILIMITADAS</b>, todas as partidas
@@ -38,32 +32,6 @@ export function Plans() {
           </h2>
         </Reveal>
         <div className="plans">
-          <Reveal as="article" className="plan">
-            <span className="ptag">Por análise · pra testar</span>
-            <h3>Análise avulsa</h3>
-            <p className="desc">O jeito mais barato de ver o produto funcionando.</p>
-            <ul>
-              {avulsaFeatures.map((f, i) => (
-                <li key={i}>
-                  <Tick />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <div className="price">
-              <span className="amt">R$ 2,99</span>
-              <span className="per">por análise</span>
-            </div>
-            <div className="price-sub">sem cadastrar cartão</div>
-            <a
-              className="btn ghost"
-              style={{ border: "1.5px solid var(--line)", justifyContent: "center" }}
-              href="/apps/app"
-            >
-              Testar uma análise
-            </a>
-          </Reveal>
-
           <Reveal as="article" className="plan feat">
             <span className="badge-feat">Copa inteira</span>
             <span className="ptag">Assinatura MatchGoal</span>
@@ -91,9 +59,9 @@ export function Plans() {
         <Reveal className="risk">
           <h4>Por que o risco de testar é baixo</h4>
           <p>
-            Não prometemos resultado, então não tratamos aposta como aplicação. Comece pela
-            análise avulsa de <b>R$ 2,99</b>, sem cadastrar cartão. Não gostou? Não gastou quase
-            nada e não ficou preso a nada.
+            Não prometemos resultado, então não tratamos aposta como aplicação. São menos de
+            <b> R$ 1 por dia</b> e você <b>cancela quando quiser</b>. Não gostou? Não ficou preso
+            a nada.
           </p>
         </Reveal>
       </div>
