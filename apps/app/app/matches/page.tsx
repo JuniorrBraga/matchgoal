@@ -13,7 +13,7 @@ export default async function MatchesPage() {
   const opener = matches[0];
 
   return (
-    <AppShell>
+    <AppShell active="matches">
       <section className="hero hero--home rise" style={{ marginBottom: "var(--space-6)" }}>
         <div className="hero__inner">
           <div className="hero__copy">

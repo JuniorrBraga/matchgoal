@@ -131,6 +131,7 @@ img {
   transition: border-color 0.15s;
 }
 .topbar__nav a:hover { border-color: rgba(255, 255, 255, 0.8); }
+.topbar__nav a.active { border-color: #fff; }
 .topbar__spacer { flex: 1; }
 .topbar__cta {
   display: inline-flex;
@@ -307,6 +308,21 @@ img {
 .badge--muted { background: var(--color-bg-muted); color: var(--color-text-muted); }
 .badge--live { background: var(--color-danger-tint); color: var(--color-danger); }
 .badge--dark { background: var(--color-ink); color: #fff; }
+
+/* ---------- aviso de bloqueio (paywall) ---------- */
+.lock-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-warning-tint);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-6);
+}
+.lock-banner__icon { font-size: 20px; line-height: 1; }
+.lock-banner__text { font-size: 14px; font-weight: 700; color: var(--color-ink); }
+.lock-banner__text strong { color: var(--color-warning); }
 
 .chip {
   display: inline-flex;

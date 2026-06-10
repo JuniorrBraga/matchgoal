@@ -30,7 +30,7 @@ export default async function MatchDetailPage({
     "Análise em preparação.";
 
   return (
-    <AppShell>
+    <AppShell active="matches">
       <Link href="/matches" className="back-link" style={{ marginBottom: "var(--space-4)", display: "inline-flex" }}>
         ← Voltar para partidas
       </Link>
