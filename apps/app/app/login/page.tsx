@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -10,6 +10,16 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Mostra o motivo quando o usuário cai aqui vindo de um link quebrado
+  // (?error=link_expired | auth_failed). Lido via window pra não forçar
+  // Suspense/dynamic no build (useSearchParams exigiria).
+  useEffect(() => {
+    const err = new URLSearchParams(window.location.search).get('error')
+    if (err === 'link_expired' || err === 'auth_failed') {
+      setError('Seu link de acesso expirou ou já foi usado. Digite seu email abaixo para receber um novo.')
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -33,7 +43,14 @@ export default function LoginPage() {
     })
 
     if (error) {
-      const notBuyer = /not found|signups? not allowed|not allowed|user/i.test(error.message)
+      // Com shouldCreateUser:false, email inexistente volta como
+      // otp_disabled/signup_disabled — código estável, não prosa do erro.
+      const code = (error as { code?: string }).code
+      const notBuyer =
+        code === 'otp_disabled' ||
+        code === 'signup_disabled' ||
+        code === 'user_not_found' ||
+        /signups? not allowed|user not found/i.test(error.message)
       setError(
         notBuyer
           ? 'Esse email não tem assinatura ativa. Assine primeiro para liberar o acesso.'

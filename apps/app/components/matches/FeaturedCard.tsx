@@ -73,7 +73,10 @@ export function FeaturedCard({
         tabIndex={0}
         onClick={onLockedClick}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onLockedClick?.();
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onLockedClick?.();
+          }
         }}
       >
         {inner}
