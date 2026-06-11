@@ -11,7 +11,7 @@ const anton = Anton({
   display: "swap",
 });
 
-// Corpo limpo e moderno.
+// Corpo limpo e moderno
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans",
