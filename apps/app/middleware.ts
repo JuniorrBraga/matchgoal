@@ -10,6 +10,11 @@ export async function middleware(request: NextRequest) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !anon) return NextResponse.next({ request })
 
+  // Visitante sem cookie de sessão: nada a refrescar — evita uma chamada de
+  // rede ao Supabase em TODA page view anônima.
+  const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('sb-'))
+  if (!hasSession) return NextResponse.next({ request })
+
   let supabaseResponse = NextResponse.next({ request })
 
   try {

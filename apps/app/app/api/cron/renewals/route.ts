@@ -15,26 +15,34 @@ interface AbacateBillingCreateResponse {
 }
 
 export async function GET(req: NextRequest) {
-  // Protege a rota — só o Vercel Cron (com CRON_SECRET) pode chamar
-  const secret =
-    req.nextUrl.searchParams.get('secret') ??
-    req.headers.get('x-cron-secret')
+  // Protege a rota. O Vercel Cron chama com "Authorization: Bearer ${CRON_SECRET}";
+  // ?secret= e x-cron-secret ficam para testes manuais.
+  const cronSecret = process.env.CRON_SECRET
+  const bearer = req.headers.get('authorization')
+  const manual =
+    req.nextUrl.searchParams.get('secret') ?? req.headers.get('x-cron-secret')
 
-  if (!secret || secret !== process.env.CRON_SECRET) {
+  const authorized =
+    Boolean(cronSecret) &&
+    (bearer === `Bearer ${cronSecret}` || manual === cronSecret)
+
+  if (!authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Busca assinantes ativos com vencimento nos próximos 3 dias
-  const now = new Date()
-  const threeDaysFromNow = new Date()
-  threeDaysFromNow.setDate(now.getDate() + 3)
+  // Janela de 1 dia (vence entre D+2 e D+3): como o cron roda diariamente,
+  // cada assinante é notificado UMA vez — não 3 dias seguidos com 3 cobranças.
+  const windowStart = new Date()
+  windowStart.setDate(windowStart.getDate() + 2)
+  const windowEnd = new Date()
+  windowEnd.setDate(windowEnd.getDate() + 3)
 
   const { data: profiles, error: dbError } = await supabaseAdmin
     .from('profiles')
     .select('id, email, period_end')
     .eq('status', 'active')
-    .gte('period_end', now.toISOString())
-    .lte('period_end', threeDaysFromNow.toISOString())
+    .gte('period_end', windowStart.toISOString())
+    .lte('period_end', windowEnd.toISOString())
 
   if (dbError) {
     console.error('[cron/renewals] DB error:', dbError.message)

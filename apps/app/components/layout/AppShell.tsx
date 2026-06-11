@@ -52,11 +52,19 @@ export async function AppShell({
           </nav>
           <span className="topbar__spacer" />
           {auth.loggedIn ? (
-            <form action="/auth/signout" method="post">
-              <button type="submit" className="topbar__cta">
-                Sair
-              </button>
-            </form>
+            <>
+              {/* Logado mas expirado: o CTA de recompra fica visível. */}
+              {!auth.active && (
+                <Link href="/paywall" className="topbar__cta" style={{ marginRight: 10 }}>
+                  Assinar
+                </Link>
+              )}
+              <form action="/auth/signout" method="post">
+                <button type="submit" className="topbar__cta">
+                  Sair
+                </button>
+              </form>
+            </>
           ) : (
             <>
               <Link
