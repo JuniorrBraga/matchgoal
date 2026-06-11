@@ -1,6 +1,7 @@
 import { DottedSurface } from "./DottedSurface";
 import { WarningIcon } from "./icons";
 import { Reveal } from "./Reveal";
+import { ABACATE_CHECKOUT } from "../lib/links";
 
 export function Footer() {
   return (
@@ -22,11 +23,11 @@ export function Footer() {
           <Reveal
             style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}
           >
-            <a className="btn big" href="/apps/app">
-              Ver minha primeira análise grátis <span className="arrow">→</span>
+            <a className="btn big" href={ABACATE_CHECKOUT}>
+              Assinar agora <span className="arrow">→</span>
             </a>
             <span className="micro on-dark">
-              Sem cartão · +18 · Aposte com responsabilidade
+              PIX ou cartão · +18 · Aposte com responsabilidade
             </span>
           </Reveal>
         </div>

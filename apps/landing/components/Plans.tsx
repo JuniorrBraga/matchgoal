@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CheckIcon } from "./icons";
 import { Reveal } from "./Reveal";
+import { ABACATE_CHECKOUT } from "../lib/links";
 
 function Tick() {
   return (
@@ -50,7 +51,7 @@ export function Plans() {
               <span className="per">/mês</span>
             </div>
             <div className="price-sub">menos de R$ 1 por dia · cancele quando quiser</div>
-            <a className="btn block" href="/apps/app">
+            <a className="btn block" href={ABACATE_CHECKOUT}>
               Assinar o MatchGoal <span className="arrow">→</span>
             </a>
           </Reveal>
