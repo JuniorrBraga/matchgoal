@@ -23,11 +23,20 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Só quem comprou (criado no Supabase pelo webhook da Abacate) pode logar.
+        shouldCreateUser: false,
+      },
     })
 
     if (error) {
-      setError(error.message)
+      const notBuyer = /not found|signups? not allowed|not allowed|user/i.test(error.message)
+      setError(
+        notBuyer
+          ? 'Esse email não tem assinatura ativa. Assine primeiro para liberar o acesso.'
+          : error.message
+      )
     } else {
       setSent(true)
     }
