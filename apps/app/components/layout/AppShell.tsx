@@ -2,8 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { ComplianceBar } from "./ComplianceBar";
+import { HeaderAuth } from "./HeaderAuth";
 import { LoginNudge } from "@/components/marketing/LoginNudge";
-import { getAuthState } from "@/lib/auth";
 
 const tickerItems = [
   "Copa do Mundo 2026 • Análise com IA",
@@ -15,16 +15,19 @@ const tickerItems = [
 
 type ActiveSection = "matches" | "grupos" | "paywall";
 
-/** Shell raiz do app (aberto): top bar + ticker + conteúdo + conformidade. */
-export async function AppShell({
+/**
+ * Shell raiz do app (aberto). ESTÁTICO de propósito: não chama getAuthState,
+ * então as páginas que o usam (grupos, planos, obrigado) são pré-renderizadas
+ * e o Next consegue fazer prefetch → navegação instantânea. O estado de login
+ * (Entrar/Sair e o nudge) é resolvido no client, sem travar a navegação.
+ */
+export function AppShell({
   children,
   active,
 }: {
   children: ReactNode;
   active?: ActiveSection;
 }) {
-  const auth = await getAuthState();
-
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -51,38 +54,7 @@ export async function AppShell({
             </Link>
           </nav>
           <span className="topbar__spacer" />
-          {auth.loggedIn ? (
-            <>
-              {/* Logado mas expirado: o CTA de recompra fica visível. */}
-              {!auth.active && (
-                <Link href="/paywall" className="topbar__cta" style={{ marginRight: 10 }}>
-                  Assinar
-                </Link>
-              )}
-              <form action="/auth/signout" method="post">
-                <button type="submit" className="topbar__cta">
-                  Sair
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                style={{
-                  color: "var(--color-text-inverse)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  marginRight: 12,
-                }}
-              >
-                Entrar
-              </Link>
-              <Link href="/paywall" className="topbar__cta">
-                Assinar
-              </Link>
-            </>
-          )}
+          <HeaderAuth />
         </div>
       </header>
 
@@ -105,8 +77,8 @@ export async function AppShell({
 
       <ComplianceBar />
 
-      {/* Popup de login no canto, só para visitantes não logados */}
-      {!auth.loggedIn && <LoginNudge />}
+      {/* Popup de login no canto (se esconde sozinho para quem já está logado) */}
+      <LoginNudge />
     </div>
   );
 }
