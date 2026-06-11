@@ -3,7 +3,7 @@
 
 /** Checkout da Abacate Pay (PIX/cartão). */
 export const ABACATE_CHECKOUT =
-  "https://app.abacatepay.com/pay/bill_BUSBLcqdYfCSpSXywWwcwXfY";
+  "https://app.abacatepay.com/pay/bill_0dYMR3jLTfnfKYjY0u1QLCg4";
 
 /** App (área logada). */
 export const APP_URL = "https://app.matchgoal.site";
