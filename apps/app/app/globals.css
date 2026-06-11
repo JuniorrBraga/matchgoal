@@ -1005,3 +1005,13 @@ img {
 .locked-panel__list li::before { content: "🔒"; font-size: 12px; }
 .locked-panel__price { font-family: var(--font-display); font-size: 44px; color: var(--color-primary); margin: var(--space-3) 0 var(--space-4); }
 .locked-panel__price small { font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--color-text-muted); }
+
+/* ---------- loading de rota (feedback instantâneo) ---------- */
+.route-loading { min-height: 62vh; display: grid; place-items: center; }
+.spinner {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--color-border, #e5e8ee);
+  border-top-color: var(--color-primary, #FF6A00);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

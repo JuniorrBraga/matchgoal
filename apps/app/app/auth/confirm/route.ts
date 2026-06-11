@@ -10,7 +10,8 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const tokenHash = searchParams.get('token_hash')
-  const type = (searchParams.get('type') ?? 'email') as EmailOtpType
+  // Padrão magiclink: é o tipo do token de admin.generateLink({type:'magiclink'}).
+  const type = (searchParams.get('type') ?? 'magiclink') as EmailOtpType
   const next = searchParams.get('next') ?? '/matches'
 
   if (tokenHash) {

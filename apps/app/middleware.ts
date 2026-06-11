@@ -32,8 +32,10 @@ export async function middleware(request: NextRequest) {
         },
       },
     })
-    // Refresca a sessão (não redireciona).
-    await supabase.auth.getUser()
+    // getSession lê o cookie LOCALMENTE (sem round-trip) para token válido e só
+    // refresca via rede quando está expirando. Bem mais leve que getUser() em
+    // toda navegação. O gate de verdade (getAuthState) continua usando getUser.
+    await supabase.auth.getSession()
   } catch {
     // Nunca derruba a navegação por erro de auth.
   }

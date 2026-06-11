@@ -259,7 +259,9 @@ export async function POST(req: NextRequest) {
       // Link via NOSSA rota /auth/confirm (verifyOtp + cookies de sessão).
       // O action_link cru da Supabase devolve tokens no fragmento (#...),
       // que o callback de servidor não enxerga.
-      const accessLink = `${APP_URL}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=email`
+      // type=magiclink: confirmado que é o que o verifyOtp aceita para o
+      // token de admin.generateLink (type=email falha).
+      const accessLink = `${APP_URL}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink`
       await resend.emails.send({
         from: EMAIL_FROM,
         to: email,
