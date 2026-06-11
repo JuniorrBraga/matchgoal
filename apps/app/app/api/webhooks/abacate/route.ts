@@ -5,67 +5,106 @@ import { resend } from '@/lib/email'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.matchgoal.site'
 const EMAIL_FROM = process.env.EMAIL_FROM ?? 'MatchGoal <noreply@matchgoal.com.br>'
 
-// Estrutura REAL do webhook da Abacate Pay (checkout.completed):
-// { event, data: { checkout: {...}, customer: { name, email, ... } } }
-// ATENÇÃO: o email fica em data.customer.email (NÃO em data.checkout.customer).
-interface AbacateWebhookBody {
-  event: string
-  devMode?: boolean
-  data: {
-    checkout?: {
-      id?: string
-      externalId?: string
-      paidAmount?: number
-      status?: string
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Procura recursivamente um email válido em qualquer lugar do payload.
+function findEmail(obj: unknown, depth = 0): string | undefined {
+  if (!obj || depth > 6) return undefined
+  if (typeof obj === 'string') return EMAIL_RE.test(obj) ? obj : undefined
+  if (Array.isArray(obj)) {
+    for (const v of obj) {
+      const e = findEmail(v, depth + 1)
+      if (e) return e
     }
-    customer?: {
-      name?: string
-      email?: string
-      taxId?: string
+    return undefined
+  }
+  if (typeof obj === 'object') {
+    const rec = obj as Record<string, unknown>
+    if (typeof rec.email === 'string' && EMAIL_RE.test(rec.email)) return rec.email
+    for (const v of Object.values(rec)) {
+      const e = findEmail(v, depth + 1)
+      if (e) return e
     }
   }
+  return undefined
+}
+
+function str(obj: Record<string, unknown> | undefined, keys: string[]): string | undefined {
+  if (!obj) return undefined
+  for (const k of keys) {
+    const v = obj[k]
+    if (typeof v === 'string' && v) return v
+  }
+  return undefined
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Valida o secret (Abacate manda como ?webhookSecret=)
+  // 1. Secret (Abacate manda como ?webhookSecret=)
   const secret = req.nextUrl.searchParams.get('webhookSecret')
   if (!secret || secret !== process.env.ABACATE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  let body: AbacateWebhookBody
+  let body: { event?: string; devMode?: boolean; data?: Record<string, unknown> }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  // 2. Só processa pagamento confirmado (checkout normal ou transparente)
-  if (body.event !== 'checkout.completed' && body.event !== 'transparent.completed') {
-    return NextResponse.json({ ok: true, ignored: true, event: body.event })
+  const event = String(body.event ?? '')
+  const data = (body.data ?? {}) as Record<string, unknown>
+
+  // 2. Só age em conclusão/pagamento; ignora estorno/disputa/cancelamento.
+  const isPaidEvent =
+    /completed|paid|succeeded|approved/i.test(event) &&
+    !/refund|dispute|charge_?back|cancel|fail|expired/i.test(event)
+  if (!isPaidEvent) {
+    return NextResponse.json({ ok: true, ignored: true, event })
   }
 
-  // 3. Extrai os campos nos caminhos REAIS da Abacate
-  const checkout = body.data?.checkout
-  const customer = body.data?.customer
-  const email = customer?.email?.toLowerCase().trim()
-  const checkoutId = checkout?.id
-  const name = customer?.name ?? ''
-  const externalId = checkout?.externalId ?? ''
+  // 3. Extrai cliente/checkout em qualquer estrutura da Abacate.
+  const checkout = (data.checkout ?? data.billing ?? data.payment ?? data.pixQrCode) as
+    | Record<string, unknown>
+    | undefined
+  const customer = (data.customer ??
+    (checkout?.customer as Record<string, unknown> | undefined)) as
+    | Record<string, unknown>
+    | undefined
+
+  const email = (str(customer, ['email']) ?? findEmail(data))?.toLowerCase().trim()
+
+  // Sem email = teste do painel (Reenviar) ou pagamento sem identificação.
+  // Responde 200 pra NÃO dar "Falha"/retentativas. Só processa cliente real.
+  if (!email) {
+    console.warn(
+      '[webhook] sem email — ignorado (teste/anônimo). event=%s status=%s',
+      event,
+      str(checkout, ['status'])
+    )
+    return NextResponse.json({ ok: true, skipped: 'sem email' })
+  }
+
+  // Idempotência por TRANSAÇÃO (não pela cobrança): numa bill MULTIPLE_PAYMENTS o
+  // checkout.id é o mesmo pra todos os pagadores. Usamos o tran_... do recibo.
+  const receiptUrl = str(checkout, ['receiptUrl']) ?? ''
+  const tranMatch = receiptUrl.match(/tran_[A-Za-z0-9]+/)
+  const txId =
+    tranMatch?.[0] ??
+    str(data.payment as Record<string, unknown> | undefined, ['id']) ??
+    str(data.transaction as Record<string, unknown> | undefined, ['id']) ??
+    `${str(checkout, ['id']) ?? 'bill'}::${email}`
+
+  const name = str(customer, ['name']) ?? ''
+  const externalId = str(checkout, ['externalId']) ?? ''
   const isRenewal = externalId.startsWith('renewal:')
 
-  if (!email || !checkoutId) {
-    console.error('[webhook] payload sem email/checkoutId:', JSON.stringify(body.data))
-    return NextResponse.json({ error: 'payload sem email/checkoutId' }, { status: 422 })
-  }
-
-  // 4. Idempotência — a Abacate reenvia webhooks
+  // 4. Idempotência
   const { data: alreadyProcessed } = await supabaseAdmin
     .from('processed_transactions')
     .select('checkout_id')
-    .eq('checkout_id', checkoutId)
+    .eq('checkout_id', txId)
     .maybeSingle()
-
   if (alreadyProcessed) {
     return NextResponse.json({ ok: true, duplicate: true })
   }
@@ -80,21 +119,16 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (existingProfile) {
-    // Renovação — só estende o período
     await supabaseAdmin
       .from('profiles')
       .update({ status: 'active', period_end: periodEnd.toISOString() })
       .eq('id', existingProfile.id)
   } else if (!isRenewal) {
-    // Novo cliente — garante a conta no Auth, ativa o perfil e manda o acesso por email.
     const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email,
       email_confirm: true,
     })
-    if (createErr) {
-      // Pode já existir (ex.: logou antes de pagar) — seguimos para achar o id.
-      console.warn('[webhook] createUser:', createErr.message)
-    }
+    if (createErr) console.warn('[webhook] createUser:', createErr.message)
 
     const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
     const uid = list?.users?.find((u) => u.email?.toLowerCase() === email)?.id
@@ -108,7 +142,6 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Email de boas-vindas com link de acesso (não bloqueia o webhook se falhar).
     try {
       const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
         type: 'magiclink',
@@ -129,12 +162,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  await supabaseAdmin.from('processed_transactions').insert({
-    checkout_id: checkoutId,
-    email,
-  })
+  await supabaseAdmin.from('processed_transactions').insert({ checkout_id: txId, email })
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, email })
 }
 
 function welcomeEmail(name: string, magicLink: string): string {
@@ -149,7 +179,7 @@ function welcomeEmail(name: string, magicLink: string): string {
         Acessar minhas análises →
       </a>
       <p style="color:#8a93a1;font-size:12px;margin:28px 0 0;">
-        Este link é de uso único e expira em 1 hora. Depois disso, é só entrar com seu email em
+        Link de uso único, expira em 1 hora. Depois é só entrar com seu email em
         <a href="${APP_URL}/login" style="color:#FF6A00;">${APP_URL.replace('https://', '')}/login</a>.
       </p>
     </div>
