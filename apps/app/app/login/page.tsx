@@ -145,9 +145,12 @@ export default function LoginPage() {
 
               <p style={{ color: '#aaa', fontSize: 12, textAlign: 'center', marginTop: 24 }}>
                 Ainda não tem acesso?{' '}
-                <Link href="/paywall" style={{ color: '#f97316', fontWeight: 600 }}>
-                  Ver planos
-                </Link>
+                <a
+                  href="https://matchgoal.site/#planos"
+                  style={{ color: '#f97316', fontWeight: 600 }}
+                >
+                  Assinar →
+                </a>
               </p>
             </>
           ) : (

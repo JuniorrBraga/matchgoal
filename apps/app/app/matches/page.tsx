@@ -3,6 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Countdown } from "@/components/matches/Countdown";
 import { MatchExplorer } from "@/components/matches/MatchExplorer";
 import { getMatchesData } from "@/lib/data";
+import { getAuthState } from "@/lib/auth";
 
 export const metadata = {
   title: "Partidas — MatchGoal",
@@ -10,6 +11,7 @@ export const metadata = {
 
 export default async function MatchesPage() {
   const matches = await getMatchesData();
+  const { active } = await getAuthState();
   const opener = matches[0];
 
   return (
@@ -28,8 +30,11 @@ export default async function MatchesPage() {
             </p>
             <Countdown targetISO={opener.kickoff} label="Pontapé inicial em" />
             <div className="hero__actions">
-              <Link href={`/matches/${opener.slug}`} className="btn btn--dark">
-                Ver análise da abertura
+              <Link
+                href={active ? `/matches/${opener.slug}` : "/paywall"}
+                className="btn btn--dark"
+              >
+                {active ? "Ver análise da abertura" : "Assinar para ver análises"}
               </Link>
               <Link href="/grupos" className="btn btn--light">
                 Tabela dos grupos
@@ -51,7 +56,7 @@ export default async function MatchesPage() {
         </div>
       </section>
 
-      <MatchExplorer matches={matches} />
+      <MatchExplorer matches={matches} locked={!active} />
     </AppShell>
   );
 }

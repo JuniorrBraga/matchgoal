@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { ComplianceBar } from "./ComplianceBar";
+import { LoginNudge } from "@/components/marketing/LoginNudge";
+import { getAuthState } from "@/lib/auth";
 
 const tickerItems = [
   "Copa do Mundo 2026 • Análise com IA",
@@ -13,14 +15,16 @@ const tickerItems = [
 
 type ActiveSection = "matches" | "grupos" | "paywall";
 
-/** Shell raiz do app: top bar laranja + ticker + conteúdo + conformidade. */
-export function AppShell({
+/** Shell raiz do app (aberto): top bar + ticker + conteúdo + conformidade. */
+export async function AppShell({
   children,
   active,
 }: {
   children: ReactNode;
   active?: ActiveSection;
 }) {
+  const auth = await getAuthState();
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -47,12 +51,30 @@ export function AppShell({
             </Link>
           </nav>
           <span className="topbar__spacer" />
-          <Link href="/login" style={{ color: 'var(--color-text-inverse)', fontSize: 14, fontWeight: 600, marginRight: 12 }}>
-            Entrar
-          </Link>
-          <Link href="/paywall" className="topbar__cta">
-            Assinar Pro
-          </Link>
+          {auth.loggedIn ? (
+            <form action="/auth/signout" method="post">
+              <button type="submit" className="topbar__cta">
+                Sair
+              </button>
+            </form>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                style={{
+                  color: "var(--color-text-inverse)",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  marginRight: 12,
+                }}
+              >
+                Entrar
+              </Link>
+              <Link href="/paywall" className="topbar__cta">
+                Assinar
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -74,6 +96,9 @@ export function AppShell({
       </main>
 
       <ComplianceBar />
+
+      {/* Popup de login no canto, só para visitantes não logados */}
+      {!auth.loggedIn && <LoginNudge />}
     </div>
   );
 }

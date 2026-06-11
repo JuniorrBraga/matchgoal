@@ -53,7 +53,7 @@ export function Differential() {
                 <span className="sm-tag">imagem pra compartilhar</span>
               </div>
               <div className="sm-match">
-                Brasil × Croácia
+                Brasil × Marrocos
                 <br />
                 <span
                   style={{
@@ -64,21 +64,21 @@ export function Differential() {
                     letterSpacing: ".04em",
                   }}
                 >
-                  Grupo · 13 jun · 13h00
+                  Grupo C · 13 jun · 19h00
                 </span>
               </div>
               <div className="sm-row">
                 <div className="sm-stat">
                   <div className="k">Vitória BRA</div>
-                  <div className="v o">54%</div>
+                  <div className="v o">52%</div>
                 </div>
                 <div className="sm-stat">
                   <div className="k">Ambas marcam</div>
-                  <div className="v">61%</div>
+                  <div className="v">56%</div>
                 </div>
                 <div className="sm-stat">
                   <div className="k">Cenário</div>
-                  <div className="v g">2×1</div>
+                  <div className="v g">2×0</div>
                 </div>
               </div>
               <div className="sm-foot">

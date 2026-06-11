@@ -20,11 +20,6 @@ export function AiAnalysisHeader({
           <div className="poster__meta">
             <span className="badge badge--dark">{kickoffLabel(match.kickoff)}</span>
             <span className="badge badge--primary">{match.group}</span>
-            {match.analysisTier === "free" ? (
-              <span className="badge badge--free">Análise grátis</span>
-            ) : (
-              <span className="badge badge--primary">Premium</span>
-            )}
           </div>
 
           <div className="poster__teams">
