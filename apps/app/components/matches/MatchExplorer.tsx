@@ -4,10 +4,22 @@ import { useMemo, useState } from "react";
 import type { Match } from "@matchgoal/shared";
 import { FeaturedCard } from "./FeaturedCard";
 import { MatchRow } from "./MatchRow";
+import { BuyModal } from "@/components/marketing/BuyModal";
 
-/** Navegação da lista: filtro por grupo + destaques + jogos. */
-export function MatchExplorer({ matches }: { matches: Match[] }) {
+/**
+ * Navegação da lista: filtro por grupo + destaques + jogos.
+ * `locked` = visitante sem assinatura → cards mostram cadeado e o clique
+ * abre o popup de compra (em vez de abrir a análise).
+ */
+export function MatchExplorer({
+  matches,
+  locked = false,
+}: {
+  matches: Match[];
+  locked?: boolean;
+}) {
   const [group, setGroup] = useState<string | null>(null);
+  const [buyOpen, setBuyOpen] = useState(false);
 
   const groups = useMemo(
     () => Array.from(new Set(matches.map((m) => m.group))),
@@ -16,6 +28,7 @@ export function MatchExplorer({ matches }: { matches: Match[] }) {
 
   const filtered = group ? matches.filter((m) => m.group === group) : matches;
   const featured = filtered.filter((m) => m.marquee);
+  const openBuy = () => setBuyOpen(true);
 
   return (
     <div className="stack">
@@ -27,7 +40,7 @@ export function MatchExplorer({ matches }: { matches: Match[] }) {
           </div>
           <div className="featured-grid">
             {featured.map((m) => (
-              <FeaturedCard key={m.id} match={m} />
+              <FeaturedCard key={m.id} match={m} locked={locked} onLockedClick={openBuy} />
             ))}
           </div>
         </section>
@@ -58,10 +71,12 @@ export function MatchExplorer({ matches }: { matches: Match[] }) {
 
         <div className="match-rows">
           {filtered.map((m) => (
-            <MatchRow key={m.id} match={m} />
+            <MatchRow key={m.id} match={m} locked={locked} onLockedClick={openBuy} />
           ))}
         </div>
       </section>
+
+      <BuyModal open={buyOpen} onClose={() => setBuyOpen(false)} />
     </div>
   );
 }

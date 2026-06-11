@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { ABACATE_CHECKOUT, APP_LOGIN_URL } from "../lib/links";
 
 const links = [
   { href: "#como", label: "Como funciona" },
@@ -40,8 +41,9 @@ export function Nav() {
         </nav>
         <div className="nav-cta">
           <span className="seal18">+18</span>
-          <a className="btn" href="/apps/app">
-            Ver análise grátis
+          <a href={APP_LOGIN_URL}>Entrar</a>
+          <a className="btn" href={ABACATE_CHECKOUT}>
+            Assinar
           </a>
         </div>
       </div>

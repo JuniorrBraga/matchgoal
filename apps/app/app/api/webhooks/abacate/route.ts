@@ -70,16 +70,26 @@ export async function POST(req: NextRequest) {
       .update({ status: 'active', period_end: periodEnd.toISOString() })
       .eq('id', existingProfile.id)
   } else if (!isRenewal) {
-    // Novo usuário — cria conta no Supabase Auth
-    // O usuário vai fazer login pelo magic link na página /login
+    // Novo usuário — cria conta no Supabase Auth (login depois via magic link).
     const { data: userData } = await supabaseAdmin.auth.admin.createUser({
       email,
       email_confirm: true,
     })
 
-    if (userData?.user) {
-      await supabaseAdmin.from('profiles').insert({
-        id: userData.user.id,
+    // Se já existir no Auth (ex.: logou ANTES de pagar), reusa o id — senão o
+    // cliente pagaria e ficaria sem acesso.
+    let uid = userData?.user?.id
+    if (!uid) {
+      const { data: list } = await supabaseAdmin.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      })
+      uid = list?.users?.find((u) => u.email?.toLowerCase() === email)?.id
+    }
+
+    if (uid) {
+      await supabaseAdmin.from('profiles').upsert({
+        id: uid,
         email,
         status: 'active',
         period_end: periodEnd.toISOString(),

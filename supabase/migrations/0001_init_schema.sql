@@ -1,13 +1,11 @@
 -- =============================================
--- MatchGoal — Schema Supabase (schema isolado "matchgoal")
--- Aplicado no projeto "Junior and Claude" (ref xuwcolzorlcneffpedcm) via MCP.
--- Fica separado do schema "public" (app de finanças) para não misturar.
+-- MatchGoal — Schema Supabase (projeto DEDICADO)
+-- Rode no SQL Editor do projeto do MatchGoal.
+-- Schema padrão "public" (projeto é só do MatchGoal, sem compartilhar com outro app).
 -- =============================================
 
-create schema if not exists matchgoal;
-
 -- Perfis dos usuários (estende auth.users do Supabase)
-create table if not exists matchgoal.profiles (
+create table if not exists public.profiles (
   id          uuid primary key references auth.users (id) on delete cascade,
   email       text unique not null,
   status      text not null default 'expired' check (status in ('active', 'expired')),
@@ -16,7 +14,7 @@ create table if not exists matchgoal.profiles (
 );
 
 -- Transações já processadas — garante idempotência nos webhooks
-create table if not exists matchgoal.processed_transactions (
+create table if not exists public.processed_transactions (
   id           uuid primary key default gen_random_uuid(),
   checkout_id  text unique not null,
   email        text not null,
@@ -24,24 +22,22 @@ create table if not exists matchgoal.processed_transactions (
 );
 
 -- Índices para as queries mais comuns
-create index if not exists profiles_email_idx on matchgoal.profiles (email);
-create index if not exists profiles_status_period_end_idx on matchgoal.profiles (status, period_end);
+create index if not exists profiles_email_idx on public.profiles (email);
+create index if not exists profiles_status_period_end_idx on public.profiles (status, period_end);
 
 -- Row Level Security
-alter table matchgoal.profiles enable row level security;
-alter table matchgoal.processed_transactions enable row level security;
+alter table public.profiles enable row level security;
+alter table public.processed_transactions enable row level security;
 
 -- Usuário lê/edita apenas o próprio perfil
+drop policy if exists "Usuário vê próprio perfil" on public.profiles;
 create policy "Usuário vê próprio perfil"
-  on matchgoal.profiles for select
+  on public.profiles for select
   using (auth.uid() = id);
 
-create policy "Usuário atualiza próprio perfil"
-  on matchgoal.profiles for update
-  using (auth.uid() = id);
+-- SEGURANÇA: NÃO criar policy de UPDATE para o usuário. Se o usuário pudesse
+-- dar UPDATE no próprio perfil, ele se auto-ativaria (status='active') sem pagar.
+-- Perfis só são escritos pelo backend (service_role, via webhook/cron).
+drop policy if exists "Usuário atualiza próprio perfil" on public.profiles;
 
 -- processed_transactions: sem policy = apenas service role (backend) acessa.
--- (O linter aponta "RLS sem policy" como INFO — é o comportamento desejado.)
-
--- NOTA: para o cliente JS acessar o schema "matchgoal" via PostgREST, adicione
--- "matchgoal" em Settings → API → Exposed schemas no painel do Supabase.

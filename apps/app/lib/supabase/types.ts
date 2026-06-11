@@ -1,7 +1,7 @@
 // Formato exato que @supabase/supabase-js espera para o generic Database.
-// Schema dedicado "matchgoal" (isolado do "public", que é do app de finanças).
+// Projeto dedicado do MatchGoal — tabelas no schema padrão "public".
 export type Database = {
-  matchgoal: {
+  public: {
     Tables: {
       profiles: {
         Row: {
