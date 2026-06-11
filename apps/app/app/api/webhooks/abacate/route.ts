@@ -20,7 +20,6 @@ function findEmail(obj: unknown, depth = 0): string | undefined {
   }
   if (typeof obj === 'object') {
     const rec = obj as Record<string, unknown>
-    // prioriza chaves "email"
     if (typeof rec.email === 'string' && EMAIL_RE.test(rec.email)) return rec.email
     for (const v of Object.values(rec)) {
       const e = findEmail(v, depth + 1)
@@ -30,7 +29,7 @@ function findEmail(obj: unknown, depth = 0): string | undefined {
   return undefined
 }
 
-function findFirst(obj: Record<string, unknown> | undefined, keys: string[]): string | undefined {
+function str(obj: Record<string, unknown> | undefined, keys: string[]): string | undefined {
   if (!obj) return undefined
   for (const k of keys) {
     const v = obj[k]
@@ -56,18 +55,15 @@ export async function POST(req: NextRequest) {
   const event = String(body.event ?? '')
   const data = (body.data ?? {}) as Record<string, unknown>
 
-  // 2. Só age em pagamento CONFIRMADO. Aceita qualquer nome de evento de
-  //    conclusão/pagamento (checkout.completed, transparent.completed,
-  //    billing.paid, subscription.completed, etc) e ignora estorno/disputa.
+  // 2. Só age em conclusão/pagamento; ignora estorno/disputa/cancelamento.
   const isPaidEvent =
-    (/completed|paid|succeeded|approved/i.test(event) || /paid/i.test(String(findFirst(data, ['status']) ?? ''))) &&
+    /completed|paid|succeeded|approved/i.test(event) &&
     !/refund|dispute|charge_?back|cancel|fail|expired/i.test(event)
-
   if (!isPaidEvent) {
     return NextResponse.json({ ok: true, ignored: true, event })
   }
 
-  // 3. Extrai email e id em QUALQUER estrutura que a Abacate use.
+  // 3. Extrai cliente/checkout em qualquer estrutura da Abacate.
   const checkout = (data.checkout ?? data.billing ?? data.payment ?? data.pixQrCode) as
     | Record<string, unknown>
     | undefined
@@ -76,25 +72,38 @@ export async function POST(req: NextRequest) {
     | Record<string, unknown>
     | undefined
 
-  const email =
-    (findFirst(customer, ['email']) ?? findEmail(data))?.toLowerCase().trim()
-  const checkoutId =
-    findFirst(checkout, ['id']) ?? findFirst(data, ['id']) ?? (email ? `evt-${email}-${Date.now()}` : undefined)
-  const name = findFirst(customer, ['name']) ?? ''
-  const externalId = findFirst(checkout, ['externalId']) ?? ''
-  const isRenewal = externalId.startsWith('renewal:')
+  const email = (str(customer, ['email']) ?? findEmail(data))?.toLowerCase().trim()
 
-  if (!email || !checkoutId) {
-    // Loga o corpo cru pra diagnóstico (aparece nos Runtime Logs do Vercel).
-    console.error('[webhook] NÃO achei email/id. event=%s body=%s', event, JSON.stringify(body).slice(0, 1500))
-    return NextResponse.json({ error: 'payload sem email/id', event }, { status: 422 })
+  // Sem email = teste do painel (Reenviar) ou pagamento sem identificação.
+  // Responde 200 pra NÃO dar "Falha"/retentativas. Só processa cliente real.
+  if (!email) {
+    console.warn(
+      '[webhook] sem email — ignorado (teste/anônimo). event=%s status=%s',
+      event,
+      str(checkout, ['status'])
+    )
+    return NextResponse.json({ ok: true, skipped: 'sem email' })
   }
+
+  // Idempotência por TRANSAÇÃO (não pela cobrança): numa bill MULTIPLE_PAYMENTS o
+  // checkout.id é o mesmo pra todos os pagadores. Usamos o tran_... do recibo.
+  const receiptUrl = str(checkout, ['receiptUrl']) ?? ''
+  const tranMatch = receiptUrl.match(/tran_[A-Za-z0-9]+/)
+  const txId =
+    tranMatch?.[0] ??
+    str(data.payment as Record<string, unknown> | undefined, ['id']) ??
+    str(data.transaction as Record<string, unknown> | undefined, ['id']) ??
+    `${str(checkout, ['id']) ?? 'bill'}::${email}`
+
+  const name = str(customer, ['name']) ?? ''
+  const externalId = str(checkout, ['externalId']) ?? ''
+  const isRenewal = externalId.startsWith('renewal:')
 
   // 4. Idempotência
   const { data: alreadyProcessed } = await supabaseAdmin
     .from('processed_transactions')
     .select('checkout_id')
-    .eq('checkout_id', checkoutId)
+    .eq('checkout_id', txId)
     .maybeSingle()
   if (alreadyProcessed) {
     return NextResponse.json({ ok: true, duplicate: true })
@@ -153,7 +162,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  await supabaseAdmin.from('processed_transactions').insert({ checkout_id: checkoutId, email })
+  await supabaseAdmin.from('processed_transactions').insert({ checkout_id: txId, email })
 
   return NextResponse.json({ ok: true, email })
 }
