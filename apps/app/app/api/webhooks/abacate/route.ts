@@ -41,6 +41,23 @@ function findEmail(obj: unknown, depth = 0): string | undefined {
   return undefined
 }
 
+// DEBUG TEMPORÁRIO: mapeia a "forma" do payload (chaves + tipos) sem expor
+// valores (PII/secrets). Ajuda a achar onde a Abacate manda o email do
+// cliente. Remover depois de confirmar o formato em produção.
+function shapeOf(obj: unknown, depth = 0): unknown {
+  if (depth > 4) return '…'
+  if (obj === null || obj === undefined) return obj
+  if (Array.isArray(obj)) return obj.length ? [shapeOf(obj[0], depth + 1)] : []
+  if (typeof obj === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+      out[k] = shapeOf(v, depth + 1)
+    }
+    return out
+  }
+  return typeof obj
+}
+
 function str(obj: Record<string, unknown> | undefined, keys: string[]): string | undefined {
   if (!obj) return undefined
   for (const k of keys) {
@@ -94,14 +111,6 @@ export async function POST(req: NextRequest) {
 
   const rawBody = await req.text()
 
-  // DEBUG TEMPORÁRIO: loga o payload bruto pra diagnosticar por que compras reais
-  // não estão batendo no banco. Remover depois de confirmar o formato.
-  console.log(
-    '[webhook DEBUG] headers=%s body=%s',
-    JSON.stringify(Object.fromEntries(req.headers.entries())),
-    rawBody
-  )
-
   const authMethod = authenticate(req, rawBody, secret)
   if (!authMethod) {
     console.warn(
@@ -122,6 +131,13 @@ export async function POST(req: NextRequest) {
 
   const event = String(body.event ?? '')
   const data = (body.data ?? {}) as Record<string, unknown>
+
+  console.log(
+    '[webhook DEBUG] event=%s devMode=%s shape=%s',
+    event,
+    String(body.devMode),
+    JSON.stringify(shapeOf(data))
+  )
 
   // Allowlist de eventos: só pagamento confirmado documentado entra.
   if (!PAID_EVENTS.has(event)) {
