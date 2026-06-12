@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { ABACATE_CHECKOUT } from "@/lib/links";
 
 /**
  * Botões de auth do header — resolvidos no CLIENT via getSession (cookie local,
@@ -49,9 +50,9 @@ export function HeaderAuth() {
       >
         Entrar
       </Link>
-      <Link href="/paywall" className="topbar__cta">
+      <a href={ABACATE_CHECKOUT} target="_blank" rel="noopener noreferrer" className="topbar__cta">
         Assinar
-      </Link>
+      </a>
     </>
   );
 }
