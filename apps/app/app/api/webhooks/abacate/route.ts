@@ -94,6 +94,14 @@ export async function POST(req: NextRequest) {
 
   const rawBody = await req.text()
 
+  // DEBUG TEMPORÁRIO: loga o payload bruto pra diagnosticar por que compras reais
+  // não estão batendo no banco. Remover depois de confirmar o formato.
+  console.log(
+    '[webhook DEBUG] headers=%s body=%s',
+    JSON.stringify(Object.fromEntries(req.headers.entries())),
+    rawBody
+  )
+
   const authMethod = authenticate(req, rawBody, secret)
   if (!authMethod) {
     console.warn(
