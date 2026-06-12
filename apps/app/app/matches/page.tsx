@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { Countdown } from "@/components/matches/Countdown";
+import { HeroSpotlight } from "@/components/matches/HeroSpotlight";
 import { MatchExplorer } from "@/components/matches/MatchExplorer";
 import { getMatchesData } from "@/lib/data";
 import { getAuthState } from "@/lib/auth";
@@ -28,7 +29,7 @@ export default async function MatchesPage() {
               Probabilidades, cenários estatísticos e bilhetes montados por IA
               para cada partida. Análise de dados — nunca promessa de resultado.
             </p>
-            <Countdown targetISO={opener.kickoff} label="Pontapé inicial em" />
+            <Countdown kickoffs={matches.map((m) => m.kickoff)} />
             <div className="hero__actions">
               <Link
                 href={active ? `/matches/${opener.slug}` : "/paywall"}
@@ -43,20 +44,12 @@ export default async function MatchesPage() {
           </div>
 
           <div className="hero__art">
-            <div className="hero__trophy-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/brand/trofeu.png"
-                alt="Troféu da Copa do Mundo"
-                className="hero__trophy"
-              />
-              <span className="hero__trophy-shine" aria-hidden="true" />
-            </div>
+            <HeroSpotlight matches={matches} serverNow={Date.now()} />
           </div>
         </div>
       </section>
 
-      <MatchExplorer matches={matches} locked={!active} />
+      <MatchExplorer matches={matches} locked={!active} serverNow={Date.now()} />
     </AppShell>
   );
 }

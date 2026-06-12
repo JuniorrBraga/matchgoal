@@ -10,7 +10,8 @@ export function Hero() {
       <div className="wrap">
         <div className="hero-copy">
           <h1 className="display" id="hero-headline">
-            Sem achismo, <span className="accent">sem picaretagem.</span>
+            Sem achismo,<br />
+            <span className="accent">sem picaretagem.</span>
           </h1>
           <span className="eyebrow" style={{ display: "block", marginTop: 16 }}>
             Análise de futebol com I.A.

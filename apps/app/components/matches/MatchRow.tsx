@@ -3,26 +3,41 @@
 import Link from "next/link";
 import type { Match } from "@matchgoal/shared";
 import { kickoffShort, pct } from "@/lib/format";
+import { matchPhase } from "@/lib/matchTime";
 
 /** Linha compacta da lista. `locked` = não-assinante (abre popup de compra). */
 export function MatchRow({
   match,
+  now,
   locked,
   onLockedClick,
 }: {
   match: Match;
+  now?: number;
   locked?: boolean;
   onLockedClick?: () => void;
 }) {
   const s = match.snapshot;
   const lead = s ? Math.max(s.home, s.draw, s.away) : 0;
   const when = kickoffShort(match.kickoff);
+  const phase = matchPhase(match.kickoff, now ?? Date.now());
 
   const inner = (
     <>
-      <div className="mrow__when">
-        {when.day}
-        <small>{when.time}</small>
+      <div className={`mrow__when mrow__when--${phase}`}>
+        {phase === "live" ? (
+          <>
+            <span className="livedot" />
+            <small>Ao vivo</small>
+          </>
+        ) : phase === "finished" ? (
+          <small>Encerrado</small>
+        ) : (
+          <>
+            {when.day}
+            <small>{when.time}</small>
+          </>
+        )}
       </div>
 
       <div className="mrow__teams">
