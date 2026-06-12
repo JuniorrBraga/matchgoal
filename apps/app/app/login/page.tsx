@@ -63,54 +63,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-    }}>
-      {/* Lado esquerdo — laranja */}
-      <div style={{
-        background: 'var(--color-primary, #f97316)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '40px 48px',
-      }}>
-        <Link href="/matches">
+    <div className="auth">
+      {/* Lado esquerdo — laranja (vira barra compacta no mobile) */}
+      <div className="auth__art">
+        <Link href="/matches" className="auth__logo">
           <Image src="/brand/logo-white.png" alt="MatchGoal" width={84} height={48} priority />
         </Link>
 
-        <div>
-          <h1 style={{
-            fontFamily: 'Anton, sans-serif',
-            fontSize: 'clamp(48px, 5vw, 72px)',
-            lineHeight: 1,
-            color: '#fff',
-            margin: '0 0 16px',
-            textTransform: 'uppercase',
-          }}>
+        <div className="auth__art-mid">
+          <h1 className="auth__title">
             Análise<br />estatística<br />de futebol<br />com IA.
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, margin: 0 }}>
+          <p className="auth__art-sub">
             Copa do Mundo 2026 — 104 partidas com probabilidades, cenários e bilhetes montados pela IA.
           </p>
         </div>
 
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, margin: 0 }}>
+        <p className="auth__art-foot">
           Análise de dados — não promessa de resultado.
         </p>
       </div>
 
       {/* Lado direito — formulário */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '40px 48px',
-        background: '#fff',
-      }}>
-        <div style={{ width: '100%', maxWidth: 380 }}>
+      <div className="auth__form-wrap">
+        <div className="auth__form">
           {!sent ? (
             <>
               <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: '#111' }}>
