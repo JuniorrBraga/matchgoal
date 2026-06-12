@@ -97,7 +97,7 @@ export const fixtures: RawFixture[] = [
     kickoff: "2026-06-14T16:00:00-05:00",
     venueStadium: "AT&T Stadium",
     venueCity: "Dallas",
-    marquee: false,
+    marquee: true,
     tier: "premium",
     prob: [0.54, 0.26, 0.2],
   },
