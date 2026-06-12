@@ -66,32 +66,37 @@ export function HeroSpotlight({
         <span className="spotlight__group">{m.group}</span>
       </div>
 
-      <div className="spotlight__teams">
-        <div className="spotlight__team">
-          <span className="spotlight__flag">{m.home.flag}</span>
-          <b>{m.home.name}</b>
+      <div className="spotlight__mid">
+        <div className="spotlight__teams">
+          <div className="spotlight__team">
+            <span className="spotlight__flag">{m.home.flag}</span>
+            <b>{m.home.name}</b>
+          </div>
+          <span className="spotlight__vs">VS</span>
+          <div className="spotlight__team">
+            <span className="spotlight__flag">{m.away.flag}</span>
+            <b>{m.away.name}</b>
+          </div>
         </div>
-        <span className="spotlight__vs">VS</span>
-        <div className="spotlight__team">
-          <span className="spotlight__flag">{m.away.flag}</span>
-          <b>{m.away.name}</b>
-        </div>
-      </div>
 
-      <div className="spotlight__clock">
-        {phase === "live" ? "Rolando agora" : fmt(Date.parse(m.kickoff) - now)}
-      </div>
-
-      {s && (
-        <div className="spotlight__odds">
-          {(["home", "draw", "away"] as const).map((k, i) => (
-            <div className="spotlight__odd" key={k}>
-              <span>{["1", "X", "2"][i]}</span>
-              <b>{pct(s[k])}</b>
-            </div>
-          ))}
+        <div className="spotlight__clock-label">
+          {phase === "live" ? "Bola rolando" : "Começa em"}
         </div>
-      )}
+        <div className="spotlight__clock">
+          {phase === "live" ? "AGORA" : fmt(Date.parse(m.kickoff) - now)}
+        </div>
+
+        {s && (
+          <div className="spotlight__odds">
+            {(["home", "draw", "away"] as const).map((k, i) => (
+              <div className="spotlight__odd" key={k}>
+                <span>{["1", "X", "2"][i]}</span>
+                <b>{pct(s[k])}</b>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="spotlight__cta">Ver análise da IA →</div>
     </Link>
