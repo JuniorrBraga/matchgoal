@@ -1,7 +1,7 @@
+import { AssinarLink } from "./AssinarLink";
 import { DottedSurface } from "./DottedSurface";
 import { WarningIcon } from "./icons";
 import { Reveal } from "./Reveal";
-import { ABACATE_CHECKOUT } from "../lib/links";
 
 export function Footer() {
   return (
@@ -23,9 +23,9 @@ export function Footer() {
           <Reveal
             style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}
           >
-            <a className="btn big" href={ABACATE_CHECKOUT}>
+            <AssinarLink className="btn big">
               Assinar agora <span className="arrow">→</span>
-            </a>
+            </AssinarLink>
             <span className="micro on-dark">
               PIX ou cartão · +18 · Aposte com responsabilidade
             </span>
