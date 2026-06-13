@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { BetSlip } from "@matchgoal/shared";
 import { odds, riskLabel } from "@/lib/format";
-import { AffiliateCta } from "./AffiliateCta";
+import { compliance } from "@/lib/compliance";
 
 const riskBadge: Record<string, string> = {
   conservative: "badge badge--free",
@@ -45,7 +45,7 @@ export function BetSlipCard({
         <span className="slip-card__total-v">{odds(slip.combinedOdds)}</span>
       </div>
 
-      <AffiliateCta href={slip.affiliateUrl} />
+      <p className="cta-note">{compliance.responsibility}</p>
 
       <p className="cta-note">
         <Link href={`/matches/${matchSlug}/share?slip=${slip.id}`}>

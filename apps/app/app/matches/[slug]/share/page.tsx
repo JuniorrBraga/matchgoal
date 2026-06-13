@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShareableImage } from "@/components/bet-slip/ShareableImage";
-import { AffiliateCta } from "@/components/bet-slip/AffiliateCta";
 import { getBetSlip, getBetSlips, getMatch } from "@/mocks";
 import { getAuthState } from "@/lib/auth";
+import { compliance } from "@/lib/compliance";
 
 export default async function SharePage({
   params,
@@ -57,7 +57,7 @@ export default async function SharePage({
         <ShareableImage match={match} slip={slip} />
 
         <div style={{ marginTop: "var(--space-5)" }}>
-          <AffiliateCta href={slip.affiliateUrl} label="Apostar no parceiro" />
+          <p className="cta-note">{compliance.responsibility}</p>
         </div>
       </div>
     </AppShell>
