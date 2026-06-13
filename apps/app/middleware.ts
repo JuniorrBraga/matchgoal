@@ -2,23 +2,23 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-type Profile = {
-  status: 'active' | 'expired'
-  period_end: string | null
-}
-
+// App ABERTO: o middleware NÃO bloqueia ninguém. Apenas mantém a sessão do
+// Supabase atualizada (refresh de token) para o SSR. O bloqueio das análises
+// acontece nas páginas (detalhe da partida) via getAuthState().
 export async function middleware(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  // Sem config de Supabase: não derruba o site (evita 500 no Edge). Apenas segue.
   if (!url || !anon) return NextResponse.next({ request })
 
-  try {
-    let supabaseResponse = NextResponse.next({ request })
+  // Visitante sem cookie de sessão: nada a refrescar — evita uma chamada de
+  // rede ao Supabase em TODA page view anônima.
+  const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('sb-'))
+  if (!hasSession) return NextResponse.next({ request })
 
+  let supabaseResponse = NextResponse.next({ request })
+
+  try {
     const supabase = createServerClient(url, anon, {
-      db: { schema: 'matchgoal' },
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -32,43 +32,19 @@ export async function middleware(request: NextRequest) {
         },
       },
     })
-
-    // IMPORTANTE: usar getUser() — getSession() usa cache e pode estar desatualizado
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.redirect(new URL('/paywall', request.url))
-    }
-
-    // Verifica assinatura ativa
-    const { data: profile } = (await supabase
-      .from('profiles')
-      .select('status, period_end')
-      .eq('id', user.id)
-      .maybeSingle()) as { data: Profile | null; error: unknown }
-
-    const isActive =
-      profile?.status === 'active' &&
-      profile?.period_end != null &&
-      new Date(profile.period_end) > new Date()
-
-    if (!isActive) {
-      return NextResponse.redirect(new URL('/paywall', request.url))
-    }
-
-    return supabaseResponse
-  } catch (err) {
-    // Nunca derruba a página com 500 por erro de auth — fail-closed no paywall.
-    console.error('[middleware] erro de auth:', err)
-    return NextResponse.redirect(new URL('/paywall', request.url))
+    // getSession lê o cookie LOCALMENTE (sem round-trip) para token válido e só
+    // refresca via rede quando está expirando. Bem mais leve que getUser() em
+    // toda navegação. O gate de verdade (getAuthState) continua usando getUser.
+    await supabase.auth.getSession()
+  } catch {
+    // Nunca derruba a navegação por erro de auth.
   }
+
+  return supabaseResponse
 }
 
 export const config = {
   matcher: [
-    // Protege tudo exceto: assets estáticos, paywall, auth, webhooks e cron
-    '/((?!_next/static|_next/image|favicon\\.ico|paywall|auth|jogo-responsavel|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|api/webhooks|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

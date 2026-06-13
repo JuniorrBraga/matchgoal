@@ -8,11 +8,9 @@ import { ScenarioCard } from "@/components/match-detail/ScenarioCard";
 import { PlayerInsights } from "@/components/match-detail/PlayerInsights";
 import { InsightPanel } from "@/components/match-detail/InsightPanel";
 import { BetSlipCard } from "@/components/bet-slip/BetSlipCard";
-import { getMatchAnalysis, getMatches } from "@/mocks";
-
-export function generateStaticParams() {
-  return getMatches().map((m) => ({ slug: m.slug }));
-}
+import { getMatchAnalysis } from "@/mocks";
+import { getAuthState } from "@/lib/auth";
+import { ABACATE_CHECKOUT } from "@/lib/links";
 
 export default async function MatchDetailPage({
   params,
@@ -25,15 +23,70 @@ export default async function MatchDetailPage({
 
   const { match, predictions, deepMarkets, scenarios, playerInsights, betSlips } =
     analysis;
+  const { active } = await getAuthState();
+
+  const backLink = (
+    <Link
+      href="/matches"
+      className="back-link"
+      style={{ marginBottom: "var(--space-4)", display: "inline-flex" }}
+    >
+      ← Voltar para partidas
+    </Link>
+  );
+
+  // 🔒 Visitante sem assinatura: app é aberto, mas a ANÁLISE é travada.
+  if (!active) {
+    return (
+      <AppShell active="matches">
+        {backLink}
+        <div className="stack">
+          <AiAnalysisHeader
+            match={match}
+            summary="Assine o Pro Copa para abrir a leitura completa da IA desta partida."
+          />
+
+          <div className="card locked-panel">
+            <div className="locked-panel__icon">🔒</div>
+            <h2 className="locked-panel__title">Análise bloqueada</h2>
+            <p className="muted">
+              Você pode navegar o app à vontade, mas as análises são exclusivas
+              para assinantes. Desbloqueie esta e todas as 104 partidas:
+            </p>
+            <ul className="locked-panel__list">
+              <li>Probabilidades por mercado (1X2, gols, ambas marcam)</li>
+              <li>Mercados avançados: cartões e escanteios</li>
+              <li>Destaques de jogadores com embasamento</li>
+              <li>Cenários estatísticos e bilhetes montados pela IA</li>
+            </ul>
+            <div className="locked-panel__price">
+              R$ 29<small>,90 / mês</small>
+            </div>
+            <a
+              href={ABACATE_CHECKOUT}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn--primary btn--block"
+            >
+              Assinar agora →
+            </a>
+            <p className="cta-note">
+              <Link href="/paywall">Ver todos os planos</Link> · Já é assinante?{" "}
+              <Link href="/login">Entrar</Link>
+            </p>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
   const headline =
     predictions.find((p) => p.market === "1x2")?.summary ??
     "Análise em preparação.";
 
   return (
-    <AppShell>
-      <Link href="/matches" className="back-link" style={{ marginBottom: "var(--space-4)", display: "inline-flex" }}>
-        ← Voltar para partidas
-      </Link>
+    <AppShell active="matches">
+      {backLink}
 
       <div className="stack">
         <AiAnalysisHeader match={match} summary={headline} />

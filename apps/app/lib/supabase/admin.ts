@@ -20,7 +20,6 @@ function getClient(): SupabaseClient<Database> {
     )
   }
   cached = createClient<Database>(url, key, {
-    db: { schema: 'matchgoal' },
     auth: { autoRefreshToken: false, persistSession: false },
   })
   return cached

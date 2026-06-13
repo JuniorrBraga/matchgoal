@@ -1,6 +1,8 @@
+import { AssinarLink } from "./AssinarLink";
 import { DottedSurface } from "./DottedSurface";
 import { ProbBar } from "./ProbBar";
 import { Reveal } from "./Reveal";
+import { APP_LOGIN_URL } from "../lib/links";
 
 export function Hero() {
   return (
@@ -9,7 +11,8 @@ export function Hero() {
       <div className="wrap">
         <div className="hero-copy">
           <h1 className="display" id="hero-headline">
-            Sem achismo, <span className="accent">sem picaretagem.</span>
+            Sem achismo,<br />
+            <span className="accent">sem picaretagem.</span>
           </h1>
           <span className="eyebrow" style={{ display: "block", marginTop: 16 }}>
             Análise de futebol com I.A.
@@ -20,14 +23,17 @@ export function Hero() {
             com palpite de grupo de WhatsApp.
           </p>
           <div className="hero-cta">
-            <a className="btn big" href="/apps/app">
-              Ler os dados da partida <span className="arrow">→</span>
+            <AssinarLink className="btn big">
+              Assinar agora <span className="arrow">→</span>
+            </AssinarLink>
+            <a className="btn ghost" href={APP_LOGIN_URL}>
+              Já sou assinante
             </a>
           </div>
           <div className="hero-foot">
             <span className="seal18">+18</span>
             <span className="micro">
-              Cancele quando quiser · Aposte com responsabilidade
+              Acesso imediato após o pagamento · Cancele quando quiser · Aposte com responsabilidade
             </span>
           </div>
         </div>
@@ -55,53 +61,53 @@ export function Hero() {
               <div className="team">
                 <div
                   className="crest"
-                  style={{ background: "linear-gradient(135deg,#E1322B,#9E1B12)" }}
+                  style={{ background: "linear-gradient(135deg,#C8102E,#7a0f1f)" }}
                 >
-                  CRO
+                  MAR
                 </div>
-                <span className="nm">Croácia</span>
+                <span className="nm">Marrocos</span>
               </div>
             </div>
-            <div className="match-meta">Grupo · 13 jun · 13h00 · processado por IA há 2 min</div>
+            <div className="match-meta">Grupo C · 13 jun · 19h00 · processado por IA há 2 min</div>
             <div className="prob-block">
               <h4>Probabilidade de resultado</h4>
               <div className="prob">
                 <div className="top">
                   <span>Vitória Brasil</span>
-                  <span className="pct">54%</span>
+                  <span className="pct">52%</span>
                 </div>
-                <ProbBar value={54} variant="o" />
+                <ProbBar value={52} variant="o" />
               </div>
               <div className="prob">
                 <div className="top">
                   <span>Empate</span>
-                  <span className="pct">27%</span>
+                  <span className="pct">26%</span>
                 </div>
-                <ProbBar value={27} variant="c" />
+                <ProbBar value={26} variant="c" />
               </div>
               <div className="prob">
                 <div className="top">
-                  <span>Vitória Croácia</span>
-                  <span className="pct">19%</span>
+                  <span>Vitória Marrocos</span>
+                  <span className="pct">22%</span>
                 </div>
-                <ProbBar value={19} variant="g" />
+                <ProbBar value={22} variant="g" />
               </div>
             </div>
             <div className="scn">
               <span className="chip">
-                Ambas marcam <b>61%</b>
+                Ambas marcam <b>56%</b>
               </span>
               <span className="chip">
-                +2.5 gols <b>48%</b>
+                +2.5 gols <b>41%</b>
               </span>
               <span className="chip">
-                Brasil sem sofrer <b>33%</b>
+                Brasil sem sofrer <b>44%</b>
               </span>
             </div>
             <div className="app-foot">
-              <a className="btn" style={{ padding: "11px 18px", fontSize: 14 }} href="/apps/app">
+              <AssinarLink className="btn" style={{ padding: "11px 18px", fontSize: 14 }}>
                 Gerar imagem
-              </a>
+              </AssinarLink>
               <span className="share">card pronto em 8s</span>
             </div>
           </div>

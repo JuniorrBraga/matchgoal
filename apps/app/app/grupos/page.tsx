@@ -10,7 +10,7 @@ export default function GruposPage() {
   const standings = getStandings();
 
   return (
-    <AppShell>
+    <AppShell active="grupos">
       <section className="hero rise" style={{ marginBottom: "var(--space-6)" }}>
         <div className="hero__inner" style={{ gridTemplateColumns: "1fr" }}>
           <div>

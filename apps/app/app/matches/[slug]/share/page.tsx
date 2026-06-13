@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShareableImage } from "@/components/bet-slip/ShareableImage";
 import { AffiliateCta } from "@/components/bet-slip/AffiliateCta";
 import { getBetSlip, getBetSlips, getMatch } from "@/mocks";
+import { getAuthState } from "@/lib/auth";
 
 export default async function SharePage({
   params,
@@ -15,6 +16,10 @@ export default async function SharePage({
   const { slug } = await params;
   const { slip: slipId } = await searchParams;
 
+  // Bilhete é conteúdo premium — sem assinatura, cai na análise travada.
+  const { active } = await getAuthState();
+  if (!active) redirect(`/matches/${slug}`);
+
   const match = getMatch(slug);
   if (!match) notFound();
 
@@ -23,7 +28,7 @@ export default async function SharePage({
   if (!slip) notFound();
 
   return (
-    <AppShell>
+    <AppShell active="matches">
       <Link href={`/matches/${slug}`} className="back-link">
         ← Voltar para a análise
       </Link>

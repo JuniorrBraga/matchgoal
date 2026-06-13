@@ -1,142 +1,214 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resend } from '@/lib/email'
+import { createHmac, timingSafeEqual } from 'crypto'
+import { activateSubscription } from '@/lib/subscription'
 
-interface AbacateWebhookBody {
-  event: string
-  devMode?: boolean
-  data: {
-    checkout: {
-      id: string
-      customer: {
-        name: string
-        email: string
-        taxId?: string
-        cellphone?: string
-      }
-      externalId?: string
-      paidAmount: number
-      status: string
+// Eventos de pagamento confirmado documentados pela Abacate Pay.
+const PAID_EVENTS = new Set([
+  'checkout.completed',
+  'transparent.completed',
+  'billing.paid',
+  'pixQrCode.paid',
+  'subscription.completed',
+  'subscription.renewed',
+])
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Procura um email válido APENAS dentro de containers de cliente/pagador —
+// nunca no payload inteiro (evita ativar o email do lojista/metadata).
+function findEmail(obj: unknown, depth = 0): string | undefined {
+  if (!obj || depth > 4) return undefined
+  if (typeof obj === 'string') return EMAIL_RE.test(obj) ? obj : undefined
+  if (Array.isArray(obj)) {
+    for (const v of obj) {
+      const e = findEmail(v, depth + 1)
+      if (e) return e
+    }
+    return undefined
+  }
+  if (typeof obj === 'object') {
+    const rec = obj as Record<string, unknown>
+    if (typeof rec.email === 'string' && EMAIL_RE.test(rec.email)) return rec.email
+    for (const v of Object.values(rec)) {
+      const e = findEmail(v, depth + 1)
+      if (e) return e
     }
   }
+  return undefined
+}
+
+// DEBUG TEMPORÁRIO: mapeia a "forma" do payload (chaves + tipos) sem expor
+// valores (PII/secrets). Ajuda a achar onde a Abacate manda o email do
+// cliente. Remover depois de confirmar o formato em produção.
+function shapeOf(obj: unknown, depth = 0): unknown {
+  if (depth > 4) return '…'
+  if (obj === null || obj === undefined) return obj
+  if (Array.isArray(obj)) return obj.length ? [shapeOf(obj[0], depth + 1)] : []
+  if (typeof obj === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+      out[k] = shapeOf(v, depth + 1)
+    }
+    return out
+  }
+  return typeof obj
+}
+
+function str(obj: Record<string, unknown> | undefined, keys: string[]): string | undefined {
+  if (!obj) return undefined
+  for (const k of keys) {
+    const v = obj[k]
+    if (typeof v === 'string' && v) return v
+  }
+  return undefined
+}
+
+function safeEq(a: string, b: string): boolean {
+  const ba = Buffer.from(a)
+  const bb = Buffer.from(b)
+  return ba.length === bb.length && timingSafeEqual(ba, bb)
+}
+
+/**
+ * Autentica aceitando as formas que a Abacate usa/documenta:
+ * query ?webhookSecret=, secret cru em header, ou HMAC-SHA256 do corpo
+ * (hex/base64, com ou sem prefixo "sha256="). Cobre erro comum de config
+ * (secret só no campo "Secret" do painel e não na URL).
+ */
+function authenticate(req: NextRequest, rawBody: string, secret: string): string | null {
+  const qs = req.nextUrl.searchParams.get('webhookSecret')
+  if (qs && safeEq(qs, secret)) return 'query'
+
+  const headerSecret =
+    req.headers.get('x-webhook-secret') ?? req.headers.get('webhook-secret')
+  if (headerSecret && safeEq(headerSecret, secret)) return 'header'
+
+  const sigRaw =
+    req.headers.get('x-webhook-signature') ?? req.headers.get('x-signature')
+  if (sigRaw) {
+    const sig = sigRaw.replace(/^sha256=/i, '')
+    const digest = createHmac('sha256', secret).update(rawBody).digest()
+    if (
+      safeEq(sig.toLowerCase(), digest.toString('hex')) ||
+      safeEq(sig, digest.toString('base64'))
+    ) {
+      return 'hmac'
+    }
+  }
+  return null
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Valida o secret da Abacate Pay
-  const secret = req.nextUrl.searchParams.get('webhookSecret')
-  if (!secret || secret !== process.env.ABACATE_WEBHOOK_SECRET) {
+  const secret = process.env.ABACATE_WEBHOOK_SECRET
+  if (!secret) {
+    console.error('[webhook] ABACATE_WEBHOOK_SECRET não configurado')
+    return NextResponse.json({ error: 'misconfigured' }, { status: 500 })
+  }
+
+  const rawBody = await req.text()
+
+  const authMethod = authenticate(req, rawBody, secret)
+  if (!authMethod) {
+    console.warn(
+      '[webhook] AUTH FALHOU. temQuery=%s temHeader=%s temAssinatura=%s',
+      Boolean(req.nextUrl.searchParams.get('webhookSecret')),
+      Boolean(req.headers.get('x-webhook-secret') ?? req.headers.get('webhook-secret')),
+      Boolean(req.headers.get('x-webhook-signature') ?? req.headers.get('x-signature'))
+    )
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // 2. Parse do body
-  let body: AbacateWebhookBody
+  let body: { event?: string; devMode?: boolean; data?: Record<string, unknown> }
   try {
-    body = await req.json()
+    body = JSON.parse(rawBody)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  // 3. Ignora eventos que não sejam checkout.completed
-  if (body.event !== 'checkout.completed') {
-    return NextResponse.json({ ok: true, ignored: true })
+  const event = String(body.event ?? '')
+  const data = (body.data ?? {}) as Record<string, unknown>
+
+  console.log(
+    '[webhook DEBUG] event=%s devMode=%s shape=%s',
+    event,
+    String(body.devMode),
+    JSON.stringify(shapeOf(data))
+  )
+
+  // Allowlist de eventos: só pagamento confirmado documentado entra.
+  if (!PAID_EVENTS.has(event)) {
+    console.log('[webhook] evento ignorado: %s', event)
+    return NextResponse.json({ ok: true, ignored: true, event })
   }
 
-  const { checkout } = body.data
-  const checkoutId = checkout.id
-  const email = checkout.customer.email.toLowerCase().trim()
-  const externalId = checkout.externalId ?? ''
-  const isRenewal = externalId.startsWith('renewal:')
+  // Pagamentos simulados (devMode) podem ser bloqueados no lançamento
+  // definindo ABACATE_BLOCK_DEV_MODE=true (durante testes, deixe sem).
+  if (body.devMode && process.env.ABACATE_BLOCK_DEV_MODE === 'true') {
+    console.log('[webhook] devMode bloqueado (ABACATE_BLOCK_DEV_MODE)')
+    return NextResponse.json({ ok: true, ignored: true, devMode: true })
+  }
 
-  // 4. Idempotência — a Abacate reenvia webhooks, nunca processa duas vezes
-  const { data: alreadyProcessed } = await supabaseAdmin
-    .from('processed_transactions')
-    .select('checkout_id')
-    .eq('checkout_id', checkoutId)
-    .maybeSingle()
+  const checkout = (data.checkout ?? data.billing ?? data.payment ?? data.pixQrCode) as
+    | Record<string, unknown>
+    | undefined
+  const customer = (data.customer ??
+    (checkout?.customer as Record<string, unknown> | undefined)) as
+    | Record<string, unknown>
+    | undefined
 
-  if (alreadyProcessed) {
+  // Email SÓ de containers de cliente/pagador.
+  const email = (
+    str(customer, ['email']) ??
+    findEmail(customer) ??
+    findEmail(data.payerInformation)
+  )
+    ?.toLowerCase()
+    .trim()
+
+  console.log(
+    '[webhook] hit auth=%s event=%s temEmail=%s checkoutId=%s status=%s devMode=%s',
+    authMethod,
+    event,
+    Boolean(email),
+    str(checkout, ['id']) ?? '?',
+    str(checkout, ['status']) ?? '?',
+    body.devMode
+  )
+
+  // Sem email = teste do painel ou pagador não identificado.
+  // 200 pra não gerar "Falha"/retentativas; loga só as CHAVES (sem PII).
+  if (!email) {
+    console.warn(
+      '[webhook] pagamento SEM EMAIL — pulado. keys(data)=%s keys(customer)=%s',
+      Object.keys(data).join(','),
+      customer ? Object.keys(customer).join(',') : 'null'
+    )
+    return NextResponse.json({ ok: true, skipped: 'sem email' })
+  }
+
+  // Idempotência por TRANSAÇÃO (bill MULTIPLE_PAYMENTS repete o checkout.id
+  // p/ todos os pagadores). Fallback final tem bucket mensal pra permitir
+  // renovação pelo MESMO link estático.
+  const receiptUrl = str(checkout, ['receiptUrl']) ?? ''
+  const tranMatch = receiptUrl.match(/tran_[A-Za-z0-9]+/)
+  const monthBucket = new Date().toISOString().slice(0, 7) // YYYY-MM
+  const txId =
+    tranMatch?.[0] ??
+    str(data.payment as Record<string, unknown> | undefined, ['id']) ??
+    str(data.transaction as Record<string, unknown> | undefined, ['id']) ??
+    `${str(checkout, ['id']) ?? 'bill'}::${email}::${monthBucket}`
+
+  const name = str(customer, ['name']) ?? ''
+
+  const result = await activateSubscription({ email, name, txId })
+  if (!result.ok) {
+    console.error('[webhook] ativação falhou (%s) — Abacate reenvia', result.error)
+    return NextResponse.json({ error: result.error }, { status: 500 })
+  }
+  if (result.duplicate) {
     return NextResponse.json({ ok: true, duplicate: true })
   }
 
-  const periodEnd = new Date()
-  periodEnd.setDate(periodEnd.getDate() + 30)
-
-  // 5. Verifica se o usuário já tem perfil
-  const { data: existingProfile } = await supabaseAdmin
-    .from('profiles')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
-
-  if (existingProfile) {
-    // Usuário existente — só atualiza o período
-    await supabaseAdmin
-      .from('profiles')
-      .update({ status: 'active', period_end: periodEnd.toISOString() })
-      .eq('id', existingProfile.id)
-  } else if (!isRenewal) {
-    // Novo usuário — cria conta no Supabase Auth e gera magic link
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-      },
-    })
-
-    if (!linkError && linkData?.user) {
-      // Cria o perfil vinculado ao usuário do Auth
-      await supabaseAdmin.from('profiles').insert({
-        id: linkData.user.id,
-        email,
-        status: 'active',
-        period_end: periodEnd.toISOString(),
-      })
-
-      // Envia email de boas-vindas com o magic link
-      const magicLink = linkData.properties?.action_link
-      if (magicLink) {
-        await resend.emails.send({
-          from: 'MatchGoal <noreply@matchgoal.com.br>',
-          to: email,
-          subject: 'Acesse o MatchGoal — seu link chegou!',
-          html: buildWelcomeEmail(checkout.customer.name, magicLink),
-        })
-      }
-    }
-  }
-  // Renovação sem perfil = edge case, só registra a transação
-
-  // 6. Registra o checkout para garantir idempotência futura
-  await supabaseAdmin.from('processed_transactions').insert({
-    checkout_id: checkoutId,
-    email,
-  })
-
+  console.log('[webhook] OK — acesso liberado (tx %s)', txId)
   return NextResponse.json({ ok: true })
-}
-
-function buildWelcomeEmail(name: string, magicLink: string): string {
-  const firstName = name?.split(' ')[0] ?? 'atleta'
-  return `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body style="font-family: sans-serif; background: #0a0a0a; color: #f5f5f5; padding: 40px 20px; margin: 0;">
-      <div style="max-width: 480px; margin: 0 auto; background: #111; border-radius: 12px; padding: 40px; border: 1px solid #222;">
-        <h1 style="color: #22c55e; margin: 0 0 8px; font-size: 28px;">Pagamento confirmado!</h1>
-        <p style="color: #aaa; margin: 0 0 32px;">Olá, ${firstName}. Seu acesso ao MatchGoal está pronto.</p>
-        <a href="${magicLink}"
-           style="display: inline-block; background: #22c55e; color: #000; font-weight: 700;
-                  text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px;">
-          Acessar minha conta →
-        </a>
-        <p style="color: #555; font-size: 12px; margin: 32px 0 0;">
-          Este link é de uso único e expira em 1 hora.<br>
-          Se não solicitou, ignore este email.
-        </p>
-      </div>
-    </body>
-    </html>
-  `
 }
