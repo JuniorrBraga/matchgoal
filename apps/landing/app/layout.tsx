@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Archivo, Space_Mono } from "next/font/google";
+import { MetaPixel } from "./components/MetaPixel";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -26,7 +27,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className={`${archivo.variable} ${spaceMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }
