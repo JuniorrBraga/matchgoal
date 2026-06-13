@@ -1,7 +1,8 @@
+import { AssinarLink } from "./AssinarLink";
 import { DottedSurface } from "./DottedSurface";
 import { ProbBar } from "./ProbBar";
 import { Reveal } from "./Reveal";
-import { ABACATE_CHECKOUT, APP_LOGIN_URL } from "../lib/links";
+import { APP_LOGIN_URL } from "../lib/links";
 
 export function Hero() {
   return (
@@ -22,9 +23,9 @@ export function Hero() {
             com palpite de grupo de WhatsApp.
           </p>
           <div className="hero-cta">
-            <a className="btn big" href={ABACATE_CHECKOUT}>
+            <AssinarLink className="btn big">
               Assinar agora <span className="arrow">→</span>
-            </a>
+            </AssinarLink>
             <a className="btn ghost" href={APP_LOGIN_URL}>
               Já sou assinante
             </a>
@@ -104,9 +105,9 @@ export function Hero() {
               </span>
             </div>
             <div className="app-foot">
-              <a className="btn" style={{ padding: "11px 18px", fontSize: 14 }} href={ABACATE_CHECKOUT}>
+              <AssinarLink className="btn" style={{ padding: "11px 18px", fontSize: 14 }}>
                 Gerar imagem
-              </a>
+              </AssinarLink>
               <span className="share">card pronto em 8s</span>
             </div>
           </div>

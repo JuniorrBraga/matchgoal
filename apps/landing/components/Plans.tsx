@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { AssinarLink } from "./AssinarLink";
 import { CheckIcon } from "./icons";
 import { Reveal } from "./Reveal";
-import { ABACATE_CHECKOUT } from "../lib/links";
 
 function Tick() {
   return (
@@ -51,9 +51,9 @@ export function Plans() {
               <span className="per">/mês</span>
             </div>
             <div className="price-sub">menos de R$ 1 por dia · cancele quando quiser</div>
-            <a className="btn block" href={ABACATE_CHECKOUT}>
+            <AssinarLink className="btn block">
               Assinar o MatchGoal <span className="arrow">→</span>
-            </a>
+            </AssinarLink>
           </Reveal>
         </div>
 
