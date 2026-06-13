@@ -21,16 +21,13 @@ export function Hero() {
           </p>
           <div className="hero-cta">
             <a className="btn big" href="/apps/app">
-              Ver análise grátis <span className="arrow">→</span>
-            </a>
-            <a className="btn ghost" href="/apps/app">
-              Ler os dados da partida
+              Ler os dados da partida <span className="arrow">→</span>
             </a>
           </div>
           <div className="hero-foot">
             <span className="seal18">+18</span>
             <span className="micro">
-              Sem cartão pra começar · Cancele quando quiser · Aposte com responsabilidade
+              Cancele quando quiser · Aposte com responsabilidade
             </span>
           </div>
         </div>

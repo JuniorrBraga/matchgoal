@@ -40,9 +40,6 @@ export function Nav() {
         </nav>
         <div className="nav-cta">
           <span className="seal18">+18</span>
-          <a className="btn" href="/apps/app">
-            Ver análise grátis
-          </a>
         </div>
       </div>
     </header>

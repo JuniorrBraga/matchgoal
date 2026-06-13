@@ -22,12 +22,7 @@ export function Footer() {
           <Reveal
             style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}
           >
-            <a className="btn big" href="/apps/app">
-              Ver minha primeira análise grátis <span className="arrow">→</span>
-            </a>
-            <span className="micro on-dark">
-              Sem cartão · +18 · Aposte com responsabilidade
-            </span>
+            <span className="micro on-dark">+18 · Aposte com responsabilidade</span>
           </Reveal>
         </div>
 

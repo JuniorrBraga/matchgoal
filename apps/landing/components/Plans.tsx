@@ -28,7 +28,7 @@ export function Plans() {
           <h2 className="sec-title">
             Comece barato.
             <br />
-            Sem cartão, sem pegadinha.
+            Sem pegadinha.
           </h2>
         </Reveal>
         <div className="plans">
