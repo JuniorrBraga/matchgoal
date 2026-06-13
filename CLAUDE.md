@@ -57,12 +57,36 @@ Regras de dependência:
 - `packages/shared` NÃO importa de nenhum app.
 - Landing e app não importam um do outro — o que for comum vai pro `shared`.
 
+## Integração de pagamento (Abacate Pay)
+
+Fluxo: LP/app → checkout Abacate → pagamento → webhook cria conta → magic-link
+por e-mail → `/login` → app.
+
+- O checkout é um **link estático** (`ABACATE_CHECKOUT`). Esse link está
+  **DUPLICADO em DOIS arquivos** — ao trocar o link, atualize os DOIS:
+  - `apps/landing/lib/links.ts`
+  - `apps/app/lib/links.ts`
+- Link de produção atual: `bill_Ea60uSj0kdmH2SeLNq5UeaDp` (R$ 29,90, Pix + Cartão).
+- A **URL de finalização** (redirect pós-pagamento) é configurada **no painel da
+  Abacate Pay**, NÃO no código. Hoje aponta para `https://app.matchgoal.site/login`.
+- Esse campo **não é editável** depois de criar o link — para mudar o redirect,
+  cria-se um link novo no painel (Produção → Cobranças → "Criar finalização de
+  compra") e troca-se a constante nos dois `links.ts`.
+- Todos os botões de assinatura (landing e app) puxam dessa constante via
+  `AssinarLink` (landing) ou import direto (app) — não há URLs hardcoded soltas.
+
 ## Ambiente e variáveis
 
 - Variáveis de ambiente documentadas em `.env.example` (apenas placeholders).
 - Arquivos `.env*` reais NUNCA são commitados (já estão no `.gitignore`).
+- O app precisa de `apps/app/.env.local` com as chaves do Supabase
+  (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`) — sem elas, `/matches` quebra no `createClient`.
 
 ## Comandos úteis
+
+> Rode tudo a partir da pasta `matchgoal/` (raiz do monorepo, onde está o
+> `package.json`). A pasta acima dela (`SaaS_betCopa/`) NÃO é o projeto.
 
 ```bash
 pnpm install                          # instala tudo
@@ -71,3 +95,7 @@ pnpm --filter @matchgoal/landing dev  # só a landing
 pnpm --filter @matchgoal/app dev      # só o app
 pnpm build                            # build de todos os pacotes
 ```
+
+Dica: se uma mudança em `links.ts` não aparecer no navegador, o dev server pode
+estar servindo cache antigo — reinicie o processo (e limpe `.next` se necessário)
+e faça hard refresh (Ctrl+Shift+R).
