@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
-import { TrackBars } from "./TrackBars";
+import { CallsRecord } from "./CallsRecord";
+import { recordSummary } from "../lib/callsRecord";
 
 const testimonials = [
   {
@@ -38,15 +39,15 @@ export function Transparency() {
           </h2>
           <p className="lead on-dark">
             Num mercado cheio de quem só aparece pra contar o que acertou, a gente faz o
-            contrário: publica o histórico completo: acertos e erros. Você não precisa confiar
-            na nossa palavra. Você confere.
+            contrário: as calls da rodada ficam públicas — acertos e erros. Você não precisa
+            confiar na nossa palavra. Você confere.
           </p>
         </Reveal>
 
         <div className="track-wrap">
           <Reveal className="chart-card">
             <div className="ch-head">
-              <h4>Histórico recente de análises</h4>
+              <h4>Calls públicas — 1ª rodada da Copa</h4>
               <div className="chart-legend">
                 <span>
                   <i style={{ background: "var(--br-green)" }} />
@@ -58,21 +59,21 @@ export function Transparency() {
                 </span>
               </div>
             </div>
-            <TrackBars />
+            <CallsRecord />
           </Reveal>
 
           <Reveal className="stats">
             <div className="stat">
-              <span className="v">12.480</span>
-              <span className="k">análises geradas</span>
+              <span className="v">{recordSummary.lossesTotal}</span>
+              <span className="k">únicos erros em toda a 1ª rodada</span>
             </div>
             <div className="stat">
-              <span className="v">2.140</span>
-              <span className="k">usuários ativos</span>
+              <span className="v">2‑0</span>
+              <span className="k">placar exato do México, cravado</span>
             </div>
             <div className="stat">
               <span className="v">100%</span>
-              <span className="k">histórico público, erros inclusos</span>
+              <span className="k">histórico aberto — acertos e erros</span>
             </div>
           </Reveal>
         </div>

@@ -11,6 +11,7 @@ export function LoginNudge() {
 
   useEffect(() => {
     const supabase = createClient();
+    if (!supabase) return; // Supabase não configurado (dev) — não exibe o nudge
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
       if (alive) setShow(!data.session);

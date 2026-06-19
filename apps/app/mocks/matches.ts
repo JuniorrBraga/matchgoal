@@ -47,6 +47,7 @@ export const matches: Match[] = fixtures.map((f, i) => {
     marquee: f.marquee,
     heroImageUrl: `/matches/${f.slug}.svg`,
     snapshot: { home: f.prob[0], draw: f.prob[1], away: f.prob[2] },
+    result: f.result ? { home: f.result[0], away: f.result[1] } : undefined,
     form: ex?.form,
     h2h: ex?.h2h,
   };

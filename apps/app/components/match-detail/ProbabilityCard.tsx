@@ -16,10 +16,10 @@ export function ProbabilityCard({ prediction }: { prediction: Prediction }) {
         </span>
       </div>
 
-      {prediction.outcomes.map((o) => {
+      {prediction.outcomes.map((o, i) => {
         const isLead = o.label === lead.label;
         return (
-          <div className="prob-outcome" key={o.label}>
+          <div className="prob-outcome" key={`${o.label}-${i}`}>
             <div className="prob-outcome__row">
               <span className="prob-outcome__label">{o.label}</span>
               <span>

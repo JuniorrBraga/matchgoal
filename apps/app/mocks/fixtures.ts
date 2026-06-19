@@ -14,6 +14,8 @@ export interface RawFixture {
   tier: "free" | "premium";
   /** [vitória mandante, empate, vitória visitante] em probabilidade 0..1 */
   prob: [number, number, number];
+  /** Placar final [mandante, visitante] — só nos jogos JÁ disputados (verificado via web). */
+  result?: [number, number];
 }
 
 export const fixtures: RawFixture[] = [
@@ -28,6 +30,7 @@ export const fixtures: RawFixture[] = [
     marquee: true,
     tier: "premium",
     prob: [0.55, 0.26, 0.19],
+    result: [2, 0],
   },
   {
     slug: "coreia-do-sul-tchequia",
@@ -40,6 +43,7 @@ export const fixtures: RawFixture[] = [
     marquee: false,
     tier: "free",
     prob: [0.4, 0.29, 0.31],
+    result: [2, 1],
   },
   {
     slug: "canada-bosnia-e-herzegovina",
@@ -64,6 +68,7 @@ export const fixtures: RawFixture[] = [
     marquee: true,
     tier: "premium",
     prob: [0.46, 0.27, 0.27],
+    result: [1, 0],
   },
   {
     slug: "brasil-marrocos",
@@ -76,6 +81,7 @@ export const fixtures: RawFixture[] = [
     marquee: true,
     tier: "premium",
     prob: [0.52, 0.26, 0.22],
+    result: [1, 1],
   },
   {
     slug: "alemanha-curacao",
@@ -183,7 +189,10 @@ export const fixtures: RawFixture[] = [
     venueCity: "Filadélfia",
     marquee: false,
     tier: "premium",
-    prob: [0.86, 0.1, 0.04],
+    // Recalibrado pós-rodada 1: Haiti perdeu 1-0 para a Escócia (defesa
+    // organizada, pouco volume ofensivo) — Brasil segue amplo favorito,
+    // mas o jogo tende a ser mais controlado/de menos gols do que o naive.
+    prob: [0.83, 0.12, 0.05],
   },
   {
     slug: "estados-unidos-australia",

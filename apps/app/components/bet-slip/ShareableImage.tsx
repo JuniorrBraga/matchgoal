@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { BetSlip, Match } from "@matchgoal/shared";
 import { odds } from "@/lib/format";
 import { AgeBadge } from "@/components/layout/AgeBadge";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 /**
  * Render do card compartilhável de um bilhete. Inclui selo 18+ obrigatório.
@@ -21,8 +22,9 @@ export function ShareableImage({
         style={{ backgroundImage: `url(${match.heroImageUrl})` }}
       >
         <div className="share-canvas__teams">
-          {match.home.flag} {match.home.shortName} × {match.away.shortName}{" "}
-          {match.away.flag}
+          <CountryFlag code={match.home.shortName} name={match.home.name} size={22} className="share-flag" />{" "}
+          {match.home.shortName} × {match.away.shortName}{" "}
+          <CountryFlag code={match.away.shortName} name={match.away.name} size={22} className="share-flag" />
         </div>
       </div>
 

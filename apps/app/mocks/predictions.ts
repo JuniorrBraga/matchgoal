@@ -4,6 +4,7 @@ import type {
   StatScenario,
 } from "@matchgoal/shared";
 import { matches } from "./matches";
+import { expectedGoals, goalsOverProb, bttsYesProb } from "../lib/model";
 
 const io = (p: number) => Math.round((1 / p) * 100) / 100;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -41,6 +42,32 @@ const marqueeScenarios: Record<string, Omit<StatScenario, "id" | "matchId">[]> =
       sampleSize: 5,
       hitRate: 0.8,
       tags: ["under", "poucos gols"],
+    },
+  ],
+  "brasil-haiti": [
+    {
+      title: "Haiti chega organizado e fechado",
+      narrative:
+        "Na estreia, o Haiti perdeu por 1-0 para a Escócia jogando fechado (só 1 gol sofrido). Contra o Brasil deve repetir o bloco baixo — paciência até o 1º gol.",
+      sampleSize: 1,
+      hitRate: 0.7,
+      tags: ["favorito", "posse", "bloco baixo"],
+    },
+    {
+      title: "Vitória do Brasil com placar controlado",
+      narrative:
+        "Diferença técnica enorme aponta vitória clara; o perfil de adversários fechados sugere jogo mais de controle do que goleada aberta — atenção ao handicap.",
+      sampleSize: 5,
+      hitRate: 0.78,
+      tags: ["vitória brasil", "handicap"],
+    },
+    {
+      title: "Brasil tende a não sofrer gol",
+      narrative:
+        "Haiti não marcou na estreia (derrota por 1-0) — ataque de baixo volume favorece o clean sheet do Brasil.",
+      sampleSize: 5,
+      hitRate: 0.72,
+      tags: ["clean sheet", "defesa"],
     },
   ],
   "mexico-africa-do-sul": [
@@ -197,27 +224,29 @@ for (const m of matches) {
     ],
   });
 
-  // Over/Under 2.5
-  const over = r2(clamp(0.4 + (maxP - 0.5) * 0.6, 0.3, 0.72));
-  const under = r2(1 - over);
+  // Total de gols — VÁRIAS linhas (1.5 / 2.5 / 3.5) via Poisson sobre o total
+  // esperado de gols (λ). Antes era só 2.5 e quase sempre caía em "under".
+  const favMax = Math.max(s.home, s.away);
+  const lambda = expectedGoals(favMax);
+  const over25 = r2(goalsOverProb(lambda, 2.5));
   predictions.push({
     id: `${m.id}-ou`,
     matchId: m.id,
     market: "over_under",
-    marketLabel: "Total de gols (2.5)",
-    confidence: confFor(Math.max(over, under)),
+    marketLabel: "Total de gols",
+    confidence: confFor(Math.max(over25, 1 - over25)),
     summary:
-      over >= under
+      over25 >= 0.5
         ? "Diferença de força tende a abrir espaços e gerar gols."
         : "Equilíbrio e cautela apontam para jogo de poucos gols.",
-    outcomes: [
-      { label: "Over 2.5", probability: over, impliedOdds: io(over) },
-      { label: "Under 2.5", probability: under, impliedOdds: io(under) },
-    ],
+    outcomes: [1.5, 2.5, 3.5].map((line) => {
+      const p = r2(goalsOverProb(lambda, line));
+      return { label: `Mais de ${line}`, probability: p, impliedOdds: io(p) };
+    }),
   });
 
-  // Ambas marcam
-  const bttsYes = r2(clamp(0.58 - (maxP - 0.5) * 0.8, 0.22, 0.6));
+  // Ambas marcam — derivado do mesmo λ (gols repartidos pelo favoritismo).
+  const bttsYes = r2(bttsYesProb(favMax, lambda));
   const bttsNo = r2(1 - bttsYes);
   predictions.push({
     id: `${m.id}-btts`,
@@ -235,25 +264,44 @@ for (const m of matches) {
     ],
   });
 
-  // Dupla chance (só destaques, evita poluir)
-  if (m.marquee) {
-    const dc = r2(clamp((homeFav ? s.home + s.draw : s.away + s.draw), 0.5, 0.93));
-    predictions.push({
-      id: `${m.id}-dc`,
-      matchId: m.id,
-      market: "double_chance",
-      marketLabel: "Dupla chance",
-      confidence: "high",
-      summary: "Combinação de baixa variância para o favorito não sair perdendo.",
-      outcomes: [
-        {
-          label: `${homeFav ? m.home.name : m.away.name} ou Empate`,
-          probability: dc,
-          impliedOdds: io(dc),
-        },
-      ],
-    });
-  }
+  // Dupla chance — para TODOS os jogos.
+  const dc = r2(clamp((homeFav ? s.home + s.draw : s.away + s.draw), 0.5, 0.93));
+  predictions.push({
+    id: `${m.id}-dc`,
+    matchId: m.id,
+    market: "double_chance",
+    marketLabel: "Dupla chance",
+    confidence: confFor(dc),
+    summary: "Baixa variância: o favorito não sai perdendo (vitória ou empate).",
+    outcomes: [
+      {
+        label: `${homeFav ? m.home.name : m.away.name} ou Empate`,
+        probability: dc,
+        impliedOdds: io(dc),
+      },
+    ],
+  });
+
+  // Empate anula (Draw No Bet) — favoritismo sem o risco do empate.
+  const favW = homeFav ? s.home : s.away;
+  const oppW = homeFav ? s.away : s.home;
+  const dnb = r2(clamp(favW / (favW + oppW), 0.05, 0.95));
+  predictions.push({
+    id: `${m.id}-dnb`,
+    matchId: m.id,
+    market: "dnb",
+    marketLabel: "Empate anula (DNB)",
+    confidence: confFor(Math.max(dnb, 1 - dnb)),
+    summary: "Se o jogo terminar empatado, a aposta é devolvida — favoritismo sem o risco do X.",
+    outcomes: [
+      { label: homeFav ? m.home.name : m.away.name, probability: dnb, impliedOdds: io(dnb) },
+      {
+        label: homeFav ? m.away.name : m.home.name,
+        probability: r2(1 - dnb),
+        impliedOdds: io(1 - dnb),
+      },
+    ],
+  });
 
   // Cenários
   const special = marqueeScenarios[m.slug];

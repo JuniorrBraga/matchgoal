@@ -106,6 +106,8 @@ function teamSignals(shortName: string, matchProb: number): TeamDeepSignals {
     defense: clamp(0.45 + (matchProb - 0.33) * 0.5, 0.3, 0.9),
     teamCardsPerGame: t.teamCardsPerGame,
     cornersForPerGame: t.cornersForPerGame,
+    // Faltas estimadas pelo perfil disciplinar (faltas puxam cartões).
+    teamFoulsPerGame: clamp(8 + t.teamCardsPerGame * 1.6, 8.5, 13),
     keyPlayers: rosters[shortName] ?? genericRoster(shortName),
   };
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AssinarLink } from "./AssinarLink";
+import { CountryFlag } from "./CountryFlag";
 import { ProbBar } from "./ProbBar";
 import { brasilFixtures, selectNextBrasilFixture } from "../lib/brasilFixtures";
 
@@ -31,19 +32,22 @@ export function NextBrazilMatch() {
       </div>
       <div className="match-row">
         <div className="team">
-          <div
-            className="crest"
-            style={{ background: "linear-gradient(135deg,#1AA64B,#0c6e30)" }}
-          >
-            BRA
-          </div>
+          <CountryFlag
+            code="BRA"
+            name="Brasil"
+            crest
+            crestBg="linear-gradient(135deg,#1AA64B,#0c6e30)"
+          />
           <span className="nm">Brasil</span>
         </div>
         <span className="vs">VS</span>
         <div className="team">
-          <div className="crest" style={{ background: fx.opponentCrest }}>
-            {fx.opponentCode}
-          </div>
+          <CountryFlag
+            code={fx.opponentCode}
+            name={fx.opponentName}
+            crest
+            crestBg={fx.opponentCrest}
+          />
           <span className="nm">{fx.opponentName}</span>
         </div>
       </div>

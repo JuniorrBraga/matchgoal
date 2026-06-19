@@ -1,4 +1,5 @@
 import type { GroupStanding } from "@matchgoal/shared";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 /** Tabela de classificação de um grupo (estilo enxuto). */
 export function StandingsTable({ standing }: { standing: GroupStanding }) {
@@ -23,7 +24,7 @@ export function StandingsTable({ standing }: { standing: GroupStanding }) {
             <tr key={r.code}>
               <td>
                 <span className="team">
-                  <span className="flag">{r.flag}</span>
+                  <CountryFlag code={r.code} name={r.name} size={16} className="flag" />
                   {r.name}
                 </span>
               </td>

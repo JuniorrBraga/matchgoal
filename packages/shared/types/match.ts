@@ -66,4 +66,6 @@ export interface Match {
   form?: TeamForm;
   /** Histórico de confrontos diretos. */
   h2h?: HeadToHead;
+  /** Placar final, quando o jogo já foi disputado (gols mandante/visitante). */
+  result?: { home: number; away: number };
 }

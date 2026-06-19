@@ -1,4 +1,5 @@
 import type { Match } from "@matchgoal/shared";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 const pillClass: Record<string, string> = { W: "fp fp--w", D: "fp fp--d", L: "fp fp--l" };
 const pillText: Record<string, string> = { W: "V", D: "E", L: "D" };
@@ -30,14 +31,14 @@ export function FormGuide({ match }: { match: Match }) {
         <div className="stack" style={{ marginBottom: "var(--space-4)" }}>
           <div className="formline" style={{ justifyContent: "space-between" }}>
             <span className="form-team">
-              <span className="flag">{match.home.flag}</span>
+              <CountryFlag code={match.home.shortName} name={match.home.name} size={20} className="flag" />
               {match.home.name}
             </span>
             <Pills results={match.form.home} />
           </div>
           <div className="formline" style={{ justifyContent: "space-between", marginTop: 10 }}>
             <span className="form-team">
-              <span className="flag">{match.away.flag}</span>
+              <CountryFlag code={match.away.shortName} name={match.away.name} size={20} className="flag" />
               {match.away.name}
             </span>
             <Pills results={match.form.away} />

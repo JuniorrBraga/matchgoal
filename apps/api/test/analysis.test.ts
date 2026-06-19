@@ -39,25 +39,34 @@ ok(
   `gols/jogo real calculado (${signals.home.keyPlayers[0].goalsPerGame})`
 );
 
-// 3) Engine de análise profunda
+// 3) Engine de análise profunda (mercados de linha + mutuamente exclusivos)
 const deep = deriveDeepAnalysis(signals);
-ok(deep.markets.length === 2, "2 mercados avançados (cartões + escanteios)");
+ok(deep.markets.length >= 6, `mercados avançados gerados (${deep.markets.length})`);
 const cards = deep.markets.find((m) => m.market === "cards");
 const corners = deep.markets.find((m) => m.market === "corners");
 ok(!!cards && !!corners, "mercados de cartões e escanteios presentes");
+ok(
+  !!deep.markets.find((m) => m.market === "asian_handicap") &&
+    !!deep.markets.find((m) => m.market === "correct_score"),
+  "mercados de handicap asiático e placar exato presentes"
+);
 
+// Probabilidades válidas (0..1) e odds implícitas > 1 em TODOS os mercados.
+// (Mercados de LINHA — over 3.5/4.5/5.5, placar exato, etc. — não somam 1; só os
+// mutuamente exclusivos somam, verificado abaixo em "equipe com mais escanteios".)
 for (const mkt of deep.markets) {
-  const sum = mkt.outcomes.reduce((s, o) => s + o.probability, 0);
-  ok(Math.abs(sum - 1) < 0.02, `probabilidades de ${mkt.market} somam ~1 (${sum.toFixed(2)})`);
   for (const o of mkt.outcomes) {
     ok(o.probability >= 0 && o.probability <= 1, `prob 0..1 em ${mkt.market}`);
     ok((o.impliedOdds ?? 0) > 1, `odd implícita > 1 em ${mkt.market}`);
   }
 }
+const mostCorners = deep.markets.find((m) => m.market === "most_corners")!;
+const mcSum = mostCorners.outcomes.reduce((s, o) => s + o.probability, 0);
+ok(Math.abs(mcSum - 1) < 0.03, `equipe c/ mais escanteios soma ~1 (${mcSum.toFixed(2)})`);
 
-// Cartões Over 4.5 deve ser MINORITÁRIO (média real ~3,3/jogo)
-const cardsOver = cards!.outcomes.find((o) => o.label === "Over 4.5")!;
-ok(cardsOver.probability < 0.5, `Over 4.5 cartões realista < 50% (${cardsOver.probability})`);
+// Cartões "Mais de 4.5" deve ser MINORITÁRIO (média real ~3,3/jogo)
+const cardsOver = cards!.outcomes.find((o) => o.label === "Mais de 4.5")!;
+ok(cardsOver.probability < 0.5, `Mais de 4.5 cartões realista < 50% (${cardsOver.probability})`);
 
 ok(deep.playerInsights.length >= 2, "pelo menos 2 destaques de jogador");
 for (const pi of deep.playerInsights) {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Match } from "@matchgoal/shared";
 import { matchPhase } from "@/lib/matchTime";
 import { pct } from "@/lib/format";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 function fmt(ms: number): string {
   let s = Math.max(0, Math.floor(ms / 1000));
@@ -60,6 +61,8 @@ export function HeroSpotlight({
           <span className="spotlight__live">
             <i /> AO VIVO
           </span>
+        ) : phase === "finished" ? (
+          <span className="spotlight__tag">✓ Encerrado</span>
         ) : (
           <span className="spotlight__tag">⚡ Próximo jogo</span>
         )}
@@ -69,21 +72,27 @@ export function HeroSpotlight({
       <div className="spotlight__mid">
         <div className="spotlight__teams">
           <div className="spotlight__team">
-            <span className="spotlight__flag">{m.home.flag}</span>
+            <CountryFlag code={m.home.shortName} name={m.home.name} size={34} className="spotlight__flag" />
             <b>{m.home.name}</b>
           </div>
           <span className="spotlight__vs">VS</span>
           <div className="spotlight__team">
-            <span className="spotlight__flag">{m.away.flag}</span>
+            <CountryFlag code={m.away.shortName} name={m.away.name} size={34} className="spotlight__flag" />
             <b>{m.away.name}</b>
           </div>
         </div>
 
         <div className="spotlight__clock-label">
-          {phase === "live" ? "Bola rolando" : "Começa em"}
+          {phase === "live" ? "Bola rolando" : phase === "finished" ? "Placar final" : "Começa em"}
         </div>
         <div className="spotlight__clock">
-          {phase === "live" ? "AGORA" : fmt(Date.parse(m.kickoff) - now)}
+          {phase === "live"
+            ? "AGORA"
+            : phase === "finished"
+            ? m.result
+              ? `${m.result.home} × ${m.result.away}`
+              : "Encerrado"
+            : fmt(Date.parse(m.kickoff) - now)}
         </div>
 
         {s && (
