@@ -54,9 +54,9 @@ export default async function MatchDetailPage({
               para assinantes. Desbloqueie esta e todas as 104 partidas:
             </p>
             <ul className="locked-panel__list">
-              <li>Probabilidades por mercado (1X2, gols, ambas marcam)</li>
-              <li>Mercados avançados: cartões e escanteios</li>
-              <li>Destaques de jogadores com embasamento</li>
+              <li>Probabilidades por mercado (1X2, gols, ambas marcam, dupla chance)</li>
+              <li>Mercados avançados: cartões, escanteios, faltas e handicap asiático</li>
+              <li>Destaques de jogadores: chance de marcar e risco de cartão</li>
               <li>Cenários estatísticos e bilhetes montados pela IA</li>
             </ul>
             <div className="locked-panel__price">
@@ -110,7 +110,7 @@ export default async function MatchDetailPage({
               <section>
                 <div className="section-head">
                   <h2 className="section-title">Mercados avançados</h2>
-                  <span className="eyebrow">Cartões · Escanteios</span>
+                  <span className="eyebrow">Cartões · Escanteios · Faltas · Handicap · Placar</span>
                 </div>
                 <div className="cards-2">
                   {deepMarkets.map((p) => (

@@ -15,6 +15,15 @@ export interface AuthState {
  */
 export const getAuthState = cache(async (): Promise<AuthState> => {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    // Sem Supabase configurado: por padrão BLOQUEADO (o paywall vale, igual à
+    // produção). Apenas para PREVIEW local explícito liberamos, via flag opt-in
+    // NEXT_PUBLIC_DEV_UNLOCK=true — e nunca em produção (trava dupla por NODE_ENV).
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.NEXT_PUBLIC_DEV_UNLOCK === "true"
+    ) {
+      return { loggedIn: true, active: true, email: "preview@local" };
+    }
     return { loggedIn: false, active: false };
   }
   try {

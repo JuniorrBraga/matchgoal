@@ -1,5 +1,6 @@
 import { AssinarLink } from "./AssinarLink";
 import { DottedSurface } from "./DottedSurface";
+import { EstreiaReads } from "./EstreiaReads";
 import { NextBrazilMatch } from "./NextBrazilMatch";
 import { Reveal } from "./Reveal";
 import { APP_LOGIN_URL } from "../lib/links";
@@ -36,6 +37,9 @@ export function Hero() {
               Acesso imediato após o pagamento · Cancele quando quiser · Aposte com responsabilidade
             </span>
           </div>
+
+          {/* Prova social real: leituras da estreia do Brasil que bateram. */}
+          <EstreiaReads />
         </div>
 
         {/* APP MOCKUP — próximo jogo do Brasil (dinâmico) */}

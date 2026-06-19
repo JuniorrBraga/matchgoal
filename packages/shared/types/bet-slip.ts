@@ -16,8 +16,8 @@ export interface BetSlipLeg {
 }
 
 /**
- * Bilhete sugerido pela IA para uma partida. Reúne seleções (legs),
- * uma justificativa e o CTA com link de afiliado.
+ * Bilhete sugerido pela IA para uma partida. Reúne seleções (legs) e uma
+ * justificativa de leitura — sem links de aposta de terceiros.
  */
 export interface BetSlip {
   id: string;
@@ -29,8 +29,6 @@ export interface BetSlip {
   /** Produto das odds das legs — referência, nunca promessa de lucro. */
   combinedOdds?: number;
   riskLevel: RiskLevel;
-  /** Link de afiliado do CTA. */
-  affiliateUrl: string;
   /** Imagem compartilhável gerada para o bilhete. */
   shareImageUrl?: string;
 }

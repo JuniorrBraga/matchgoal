@@ -1,5 +1,7 @@
 import type { Match } from "@matchgoal/shared";
 import { kickoffLabel } from "@/lib/format";
+import { matchPhase } from "@/lib/matchTime";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 /** Poster hero do detalhe + faixa com a leitura da IA. */
 export function AiAnalysisHeader({
@@ -9,6 +11,8 @@ export function AiAnalysisHeader({
   match: Match;
   summary: string;
 }) {
+  const finished = match.result && matchPhase(match.kickoff) === "finished";
+
   return (
     <section className="stack">
       <div
@@ -20,16 +24,19 @@ export function AiAnalysisHeader({
           <div className="poster__meta">
             <span className="badge badge--dark">{kickoffLabel(match.kickoff)}</span>
             <span className="badge badge--primary">{match.group}</span>
+            {finished && <span className="badge badge--dark">Encerrado</span>}
           </div>
 
           <div className="poster__teams">
             <span className="poster__team">
-              <span className="flag">{match.home.flag}</span>
+              <CountryFlag code={match.home.shortName} name={match.home.name} size={42} className="flag" />
               {match.home.name}
             </span>
-            <span className="poster__vs">VS</span>
+            <span className="poster__vs">
+              {finished ? `${match.result!.home} × ${match.result!.away}` : "VS"}
+            </span>
             <span className="poster__team">
-              <span className="flag">{match.away.flag}</span>
+              <CountryFlag code={match.away.shortName} name={match.away.name} size={42} className="flag" />
               {match.away.name}
             </span>
           </div>

@@ -41,14 +41,40 @@ export const brasilFixtures: BrasilFixture[] = [
     opponentCode: "HAI",
     opponentCrest: "linear-gradient(135deg,#1B3A8B,#D21034)",
     meta: "Grupo C · 19 jun · 21h30 · processado por IA há 2 min",
-    prob: { bra: 86, empate: 10, opp: 4 },
+    // Recalibrado pós-rodada 1: Haiti perdeu 1-0 para a Escócia jogando fechado —
+    // Brasil segue amplíssimo favorito, mas jogo tende a ser mais controlado e
+    // de menos gols (clean sheet mais provável) do que um modelo ingênuo supõe.
+    prob: { bra: 83, empate: 12, opp: 5 },
     chips: [
-      { label: "Ambas marcam", value: "28%" },
-      { label: "+2.5 gols", value: "64%" },
-      { label: "Brasil sem sofrer", value: "58%" },
+      { label: "Ambas marcam", value: "23%" },
+      { label: "+2.5 gols", value: "55%" },
+      { label: "Brasil sem sofrer", value: "63%" },
     ],
   },
 ];
+
+/**
+ * Estreia do Brasil já disputada (13/jun/2026): 1-1 com o Marrocos
+ * (Saibari abriu; Vini Jr. empatou). Leituras REAIS que bateram no 1-1 com o
+ * Vini marcando — prova social honesta, sem inventar números. Todas verdadeiras
+ * para um 1-1: 2 gols (mais de 1.5, menos de 2.5 e de 3.5), ambas marcaram,
+ * Brasil sofreu gol, Marrocos não perdeu (empate) e o Vini marcou.
+ */
+export const brasilLastResult = {
+  opponentName: "Marrocos",
+  opponentCode: "MAR",
+  date: "13 jun",
+  score: { bra: 1, opp: 1 },
+  readsThatHit: [
+    "Ambas marcam",
+    "Mais de 1.5 gols",
+    "Menos de 2.5 gols",
+    "Menos de 3.5 gols",
+    "Brasil sofre gol",
+    "Marrocos não perde (dupla chance)",
+    "Vini Jr. marca",
+  ],
+};
 
 /**
  * Próximo jogo do Brasil pela data informada: o 1º com kickoff no futuro.

@@ -540,6 +540,58 @@ img {
 .mrow__team + .mrow__team { margin-top: 4px; }
 .mrow__team .flag { font-size: 18px; }
 .mrow__group { font-size: 11.5px; color: var(--color-text-subtle); margin-top: 4px; }
+
+/* =========================================================
+   BANDEIRAS REAIS (flagcdn) — substituem o emoji que o Windows
+   renderiza como "AR"/"BRA". Ver components/ui/CountryFlag.tsx.
+   ========================================================= */
+.flag-img {
+  display: inline-block;
+  width: auto;
+  border-radius: 4px;
+  object-fit: cover;
+  vertical-align: middle;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.14);
+  background: rgba(0, 0, 0, 0.04);
+}
+.flag-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7em;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--color-text, #16181d);
+  vertical-align: middle;
+}
+/* Sobre fundos escuros (poster/spotlight/cards), anel claro + sombra. */
+.poster__team .flag-img,
+.spotlight__team .flag-img,
+.fcard__team .flag-img {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.poster__team .flag-fallback,
+.spotlight__team .flag-fallback,
+.fcard__team .flag-fallback {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.share-flag { margin: 0 2px; }
+/* Placar final na linha da lista (substitui os mini-odds quando encerrado). */
+.mrow__score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+.mrow__score b { font-size: 20px; font-weight: 900; }
+.mrow__score i { font-style: normal; opacity: 0.45; font-size: 13px; }
+
 .mrow__odds { display: flex; gap: var(--space-2); }
 .mini-odd {
   display: flex;

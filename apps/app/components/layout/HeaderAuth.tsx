@@ -14,6 +14,7 @@ export function HeaderAuth() {
 
   useEffect(() => {
     const supabase = createClient();
+    if (!supabase) return; // Supabase não configurado (dev) — visitante deslogado
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
       if (alive) setLoggedIn(!!data.session);

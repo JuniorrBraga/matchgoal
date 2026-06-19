@@ -7,7 +7,12 @@ export type MarketKey =
   | "double_chance"
   | "correct_score"
   | "cards"
-  | "corners";
+  | "corners"
+  | "fouls"
+  | "asian_handicap"
+  | "dnb"
+  | "team_goals"
+  | "most_corners";
 
 export type Confidence = "low" | "medium" | "high";
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Match } from "@matchgoal/shared";
 import { kickoffLabel, pct } from "@/lib/format";
 import { matchPhase } from "@/lib/matchTime";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 /** Card grande de jogo em destaque. `locked` = não-assinante (abre popup de compra). */
 export function FeaturedCard({
@@ -20,6 +21,7 @@ export function FeaturedCard({
   const s = match.snapshot;
   const lead = s ? Math.max(s.home, s.draw, s.away) : 0;
   const phase = matchPhase(match.kickoff, now ?? Date.now());
+  const finished = phase === "finished" && match.result;
   const when =
     phase === "live" ? (
       <span className="fcard__when fcard__when--live">
@@ -41,17 +43,21 @@ export function FeaturedCard({
           {when}
           {locked ? (
             <span className="badge badge--lock">🔒 Bloqueada</span>
+          ) : finished ? (
+            <span className="badge badge--dark">
+              {match.result!.home} × {match.result!.away}
+            </span>
           ) : (
             <span className="badge badge--primary">Análise IA</span>
           )}
         </div>
         <div className="fcard__teams">
           <span className="fcard__team">
-            <span className="flag">{match.home.flag}</span>
+            <CountryFlag code={match.home.shortName} name={match.home.name} size={24} className="flag" />
             {match.home.name}
           </span>
           <span className="fcard__team">
-            <span className="flag">{match.away.flag}</span>
+            <CountryFlag code={match.away.shortName} name={match.away.name} size={24} className="flag" />
             {match.away.name}
           </span>
         </div>
@@ -60,7 +66,13 @@ export function FeaturedCard({
       <div className="fcard__body">
         <div className="fcard__meta">
           <span>{match.group}</span>
-          <span>{locked ? "🔒 Assine para abrir" : "Análise da IA →"}</span>
+          <span>
+            {locked
+              ? "🔒 Assine para abrir"
+              : finished
+              ? "Ver leitura pré-jogo →"
+              : "Análise da IA →"}
+          </span>
         </div>
         {s && (
           <div className="odds-row">
