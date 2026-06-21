@@ -1,9 +1,8 @@
 // Links externos da landing page.
-// Fluxo: LP → checkout Abacate → pagamento → webhook cria conta → /login → app.
+// Fluxo: LP → checkout Kiwify → pagamento → webhook cria conta → /login → app.
 
-/** Checkout da Abacate Pay (PIX/cartão). */
-export const ABACATE_CHECKOUT =
-  "https://app.abacatepay.com/pay/bill_Ea60uSj0kdmH2SeLNq5UeaDp";
+/** Checkout da Kiwify (PIX/cartão/boleto). */
+export const ABACATE_CHECKOUT = "https://pay.kiwify.com.br/NfTuIhY";
 
 /** App (área logada). */
 export const APP_URL = "https://app.matchgoal.site";
